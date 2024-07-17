@@ -68,7 +68,7 @@ function initializeChatWidget() {
 
     async function fetchWelcomeMessage() {
         try {
-            const response = await fetch(`http://chat.swiss-bot.com:5000/api/welcome_message?user_id=${userId}`);
+            const response = await fetch(`http://chat.swiss-bot.com/api/welcome_message?user_id=${userId}`);
             const data = await response.json();
             const welcomeMessage = data.welcome_message || "Welcome to your virtual assistant! 😊 How can I assist you today?";
             appendMessage(welcomeMessage, 'bot');
@@ -86,7 +86,7 @@ function initializeChatWidget() {
             setLoading(true);
 
             try {
-                const response = await fetch(`http://chat.swiss-bot.com:5000/api/chatbot_reponse?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&user_id=${userId}&language=english`);
+                const response = await fetch(`http://chat.swiss-bot.com/api/chatbot_reponse?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&user_id=${userId}&language=english`);
                 const data = await response.json();
                 appendMessage(data.reponse, 'bot');
             } catch (error) {
