@@ -86,9 +86,9 @@ function initializeChatWidget() {
             setLoading(true);
 
             try {
-                const response = await fetch(`https://chat.swiss-bot.com/api/chatbot_reponse?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&user_id=${userId}&language=english`);
+                const response = await fetch(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&user_id=${userId}&language=english`);
                 const data = await response.json();
-                appendMessage(data.reponse, 'bot');
+                appendMessage(data.response, 'bot');
             } catch (error) {
                 console.error('Error fetching chatbot response:', error);
                 appendMessage('Failed to get response from server.', 'bot');
