@@ -43,11 +43,15 @@ function initializeChatWidget() {
 
     chatWidgetIcon.addEventListener('click', function () {
         chatWindow.style.display = 'flex';
-        fetchWelcomeMessage();
+        document.body.classList.add('no-scroll');
+        if (chatBody.childElementCount === 0) {
+            fetchWelcomeMessage();
+        }
     });
 
     closeChatBtn.addEventListener('click', function () {
         chatWindow.style.display = 'none';
+        document.body.classList.remove('no-scroll');
     });
 
     sendMessageBtn.addEventListener('click', function () {
