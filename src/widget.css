@@ -211,9 +211,9 @@ to {
 
     .chat-window {
         position: fixed;
-        left: 5%;
-        bottom: 0;
-        width: 90%;
+        left: 4%;
+        bottom: 1%;
+        width: 92%;
         height: 90%;
         border-radius: 16px;
     }
