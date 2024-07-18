@@ -1,3 +1,20 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.chat-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99998;
+}
+
 .chat-window, .chat-window * {
     font-family: Arial, sans-serif;
     font-size: 15px;
@@ -32,7 +49,7 @@
     right: 20px;
     width: 400px;
     height: 550px;
-    background-color: white;
+    background-color: transparent;
     border: none;
     border-radius: 16px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -77,12 +94,14 @@
     border-bottom: 1px solid #ccc;
     display: flex;
     flex-direction: column;
+    background-color: white;
 }
 
 .chat-footer {
     display: flex;
     padding: 10px;
     border-top: 1px solid #ccc;
+    background-color: white;
 }
 
 .chat-footer input {
@@ -196,7 +215,7 @@ to {
         bottom: 0;
         width: 90%;
         height: 90%;
-        border-radius: 0;
+        border-radius: 16px 16px 0px 0px;
     }
 
 
