@@ -208,4 +208,8 @@ to {
     body.no-scroll {
         overflow: hidden;
     }
+
+    .close-chat-widget-icon {
+        font-size: 24px;
+    }
 }
