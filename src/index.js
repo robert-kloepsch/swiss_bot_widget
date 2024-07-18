@@ -22,7 +22,7 @@ function initializeChatWidget() {
 
     chatWindow.innerHTML = `
         <div class="chat-header">
-            <span>Chat with us!</span>
+            <span class="chat-title">Swiss Chatbot Factory</span>
             <button class="close-btn close-chat-widget-icon">X</button>
         </div>
         <div class="chat-body"></div>
