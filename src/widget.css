@@ -7,7 +7,6 @@ body, html {
 
 .chat-window, .chat-window * {
     font-family: Arial, sans-serif;
-    font-size: 16px;
     font-weight: normal;
 }
 
