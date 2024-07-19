@@ -30,7 +30,7 @@ function initializeChatWidget() {
                 <button class="close-btn close-chat-widget-icon">X</button>
             </div>
             <div class="powered-by">
-                <a class="powered-by-text" href="http://landing.swiss-bot.com/" target="_blank">Powered by Swiss Chatbot Factory</a>
+                <span class="powered-by-text" onclick="window.open('http://landing.swiss-bot.com/', '_blank')">Powered by Swiss Chatbot Factory</span>
             </div>            
         </div>
         <div class="chat-body"></div>
