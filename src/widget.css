@@ -7,14 +7,14 @@ body, html {
 
 .chat-window, .chat-window * {
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: normal;
 }
 
 .chat-widget-icon {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 25px;
+    right: 25px;
     background-color: #0082ba;
     color: white;
     border-radius: 50%;
@@ -27,6 +27,19 @@ body, html {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     font-size: 24px;
     z-index: 999998 !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .chat-title {
@@ -46,6 +59,14 @@ body, html {
     display: flex;
     flex-direction: column;
     z-index: 10000000 !important;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.chat-window.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .hidden {
@@ -58,8 +79,24 @@ body, html {
     padding: 15px;
     border-radius: 16px 16px 0px 0px;
     display: flex;
+    flex-direction: column;
+}
+
+.chat-header-title {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.powered-by {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.powered-by-text {
+    font-size: 10px;
+    color: rgb(233, 233, 233);
 }
 
 .close-btn {
@@ -96,9 +133,9 @@ body, html {
 
 .chat-footer input {
     flex: 1;
-    padding: 5px;
+    padding: 7px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 8px;
     outline: none;
     font-size: 16px;
 }
@@ -109,7 +146,7 @@ body, html {
     background-color: #0082ba;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
@@ -130,6 +167,7 @@ body, html {
     background-color: #0082ba;
     color: white;
     border-radius: 8px;
+    padding: 8px;
 }
 
 .widget-user-message > :first-child {
@@ -145,7 +183,7 @@ body, html {
 .widget-bot-message {
     align-self: flex-start;
     background-color: #ffffff;
-    color: black;
+    color: rgb(64, 64, 64);
     border-radius: 8px;
 }
 
@@ -161,7 +199,7 @@ body, html {
 
 .widget-send-icon {
     font-size: 16px;
-    font-style: none !important;
+    font-style: normal;
 }
 
 /* Loading dots */
@@ -218,12 +256,7 @@ to {
         border-radius: 16px;
     }
 
-
     body.no-scroll {
         overflow: hidden;
-    }
-
-    .close-chat-widget-icon {
-        font-size: 24px;
     }
 }
