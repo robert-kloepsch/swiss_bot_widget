@@ -8,6 +8,8 @@ function initializeChatWidget() {
     }
 
     const userId = container.getAttribute('data-user-id');
+    const themeColor = container.getAttribute('data-theme-color') || '#0082ba';
+    const hoverColor = container.getAttribute('data-hover-color') || '#0595d3';
     if (!userId) {
         console.error('User ID not found');
         return;
@@ -42,6 +44,35 @@ function initializeChatWidget() {
         </div>
     `;
 
+    // Inject dynamic styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .chat-widget-icon {
+            background-color: ${themeColor};
+        }
+
+        .chat-header {
+            background-color: ${themeColor};
+        }
+
+        .chat-footer button {
+            background-color: ${themeColor};
+        }
+
+        .widget-user-message {
+            background-color: ${themeColor};
+        }
+
+        .loading-dots div {
+            background-color: ${themeColor};
+        }
+
+        .chat-footer button:hover {
+            background-color: ${hoverColor};
+        }
+    `;
+    document.head.appendChild(style);
+
     container.appendChild(chatWidgetIcon);
     container.appendChild(chatOverlay);
     container.appendChild(chatWindow);
@@ -67,14 +98,14 @@ function initializeChatWidget() {
         chatWindow.classList.remove('show');
         chatOverlay.classList.add('hidden');
         document.body.classList.remove('no-scroll');
-        setTimeout(() => chatWindow.classList.add('hidden'), 300); // Match the transition duration
+        setTimeout(() => chatWindow.classList.add('hidden'), 500); // Match the transition duration
     });
 
     chatOverlay.addEventListener('click', function () {
         chatWindow.classList.remove('show');
         chatOverlay.classList.add('hidden');
         document.body.classList.remove('no-scroll');
-        setTimeout(() => chatWindow.classList.add('hidden'), 300); // Match the transition duration
+        setTimeout(() => chatWindow.classList.add('hidden'), 500); // Match the transition duration
     });
 
     sendMessageBtn.addEventListener('click', function () {
