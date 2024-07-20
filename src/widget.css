@@ -17,14 +17,14 @@ body, html {
     background-color: #0082ba;
     color: white;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 24px;
+    font-size: 28px;
     z-index: 999998 !important;
     animation: pulse 2s infinite;
 }
@@ -60,7 +60,7 @@ body, html {
     z-index: 10000000 !important;
     opacity: 0;
     transform: translateY(100%);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .chat-window.show {
@@ -87,19 +87,6 @@ body, html {
     align-items: center;
 }
 
-.powered-by {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.powered-by-text {
-    font-size: 10px;
-    color: rgb(233, 233, 233);
-    cursor: pointer;
-    text-decoration: underline;
-}
-
 .close-btn {
     background: none;
     border: none;
@@ -118,8 +105,6 @@ body, html {
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
     display: flex;
     flex-direction: column;
     background-color: white;
@@ -127,9 +112,28 @@ body, html {
 
 .chat-footer {
     display: flex;
+    flex-direction: column;
     padding: 10px;
-    border-top: 1px solid #ccc;
     background-color: white;
+    gap: 10px;
+}
+
+.powered-by {
+    display: flex;
+    justify-content: center;
+}
+
+.powered-by-text {
+    font-size: 10px;
+    color: rgb(146, 146, 146);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.input-send-container {
+    display: flex;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
 }
 
 .chat-footer input {
@@ -169,6 +173,7 @@ body, html {
     color: white;
     border-radius: 8px;
     padding: 8px;
+    font-size: 16px;
 }
 
 .widget-user-message > :first-child {
@@ -186,6 +191,7 @@ body, html {
     background-color: #ffffff;
     color: rgb(64, 64, 64);
     border-radius: 8px;
+    font-size: 16px;
 }
 
 .widget-bot-message > :first-child {

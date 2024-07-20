@@ -28,15 +28,17 @@ function initializeChatWidget() {
             <div class="chat-header-title">
                 <span class="chat-title">Chat with us!</span>
                 <button class="close-btn close-chat-widget-icon">X</button>
-            </div>
-            <div class="powered-by">
-                <span class="powered-by-text" onclick="window.open('http://landing.swiss-bot.com/', '_blank')">Powered by Swiss Chatbot Factory</span>
-            </div>            
+            </div>         
         </div>
         <div class="chat-body"></div>
         <div class="chat-footer">
-            <input type="text" class="chat-input" placeholder="Type your message...">
-            <button class="send-message"><i class="widget-send-icon">Send</i></button>
+            <div class="powered-by">
+                <span class="powered-by-text" onclick="window.open('http://landing.swiss-bot.com/', '_blank')">Powered by Swiss Chatbot Factory</span>
+            </div>
+            <div class="input-send-container">
+                <input type="text" class="chat-input" placeholder="Type your message...">
+                <button class="send-message"><i class="widget-send-icon">Send</i></button>
+            </div>
         </div>
     `;
 
