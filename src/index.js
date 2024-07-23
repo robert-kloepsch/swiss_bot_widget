@@ -7,7 +7,7 @@ function initializeChatWidget() {
         return;
     }
 
-    const botId = container.getAttribute('data-bot-id');
+    const botId = container.getAttribute('data-user-id');
     const themeColor = container.getAttribute('data-theme-color') || '#0082ba';
     const hoverColor = container.getAttribute('data-hover-color') || '#0595d3';
     if (!botId) {
