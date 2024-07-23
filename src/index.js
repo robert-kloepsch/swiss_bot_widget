@@ -7,10 +7,10 @@ function initializeChatWidget() {
         return;
     }
 
-    const userId = container.getAttribute('data-user-id');
+    const botId = container.getAttribute('data-bot-id');
     const themeColor = container.getAttribute('data-theme-color') || '#0082ba';
     const hoverColor = container.getAttribute('data-hover-color') || '#0595d3';
-    if (!userId) {
+    if (!botId) {
         console.error('User ID not found');
         return;
     }
@@ -130,8 +130,7 @@ function initializeChatWidget() {
 
     async function fetchWelcomeMessage() {
         try {
-            console.log(userId)
-            const response = await fetch(`https://chat.swiss-bot.com/api/welcome_message?user_id=${userId}`);
+            const response = await fetch(`https://chat.swiss-bot.com/api/welcome_message?bot_id=${botId}`);
             const data = await response.json();
             const welcomeMessage = data.welcome_message || "Welcome to your virtual assistant! 😊 How can I assist you today?";
             appendMessage(welcomeMessage, 'bot');
@@ -149,7 +148,7 @@ function initializeChatWidget() {
             setLoading(true);
 
             try {
-                const response = await fetch(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&user_id=${userId}&language=english`);
+                const response = await fetch(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
                 const data = await response.json();
                 appendMessage(data.response, 'bot');
             } catch (error) {
