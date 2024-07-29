@@ -131,7 +131,7 @@ function initializeChatWidget() {
 
     async function fetchWelcomeMessage() {
         try {
-            const response = await fetch(`http://192.168.1.14:5000/api/welcome_message?bot_id=${botId}`);
+            const response = await fetch(`https://chat.swiss-bot.com/api/welcome_message?bot_id=${botId}`);
             const data = await response.json();
             const welcomeMessage = data.welcome_message || "Welcome to your virtual assistant! 😊 How can I assist you today?";
             appendMessage(welcomeMessage, 'bot');
@@ -150,7 +150,7 @@ function initializeChatWidget() {
             currentBotMessage = '';
 
             try {
-                const eventSource = new EventSource(`http://192.168.1.14:5000/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
+                const eventSource = new EventSource(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
 
                 eventSource.onmessage = (event) => {
                     const chunk = event.data;
