@@ -82,6 +82,7 @@ function initializeChatWidget() {
     const chatInput = chatWindow.querySelector('.chat-footer input');
     const sendMessageBtn = chatWindow.querySelector('.send-message');
     let sessionId = generateSessionId();
+    let currentBotMessage = '';
 
     chatWidgetIcon.addEventListener('click', function () {
         chatWindow.classList.remove('hidden');
@@ -130,7 +131,7 @@ function initializeChatWidget() {
 
     async function fetchWelcomeMessage() {
         try {
-            const response = await fetch(`https://chat.swiss-bot.com/api/welcome_message?bot_id=${botId}`);
+            const response = await fetch(`http://192.168.1.14:5000/api/welcome_message?bot_id=${botId}`);
             const data = await response.json();
             const welcomeMessage = data.welcome_message || "Welcome to your virtual assistant! 😊 How can I assist you today?";
             appendMessage(welcomeMessage, 'bot');
@@ -146,17 +147,55 @@ function initializeChatWidget() {
             appendMessage(message, 'user');
             chatInput.value = '';
             setLoading(true);
+            currentBotMessage = '';
 
             try {
-                const response = await fetch(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
-                const data = await response.json();
-                appendMessage(data.response, 'bot');
+                const eventSource = new EventSource(`http://192.168.1.14:5000/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
+
+                eventSource.onmessage = (event) => {
+                    const chunk = event.data;
+                    if (chunk !== 'end of response') {
+                        const parsedChunk = chunk.replace(/<newline>/g, '\n');
+                        currentBotMessage += parsedChunk;
+                        updateBotMessage(currentBotMessage);
+                        scrollToBottom();
+                    }
+                };
+
+                eventSource.onerror = (error) => {
+                    console.error('Error fetching response:', error);
+                    if (loading) {
+                        appendMessage('Failed to get response from server.', 'bot');
+                        setLoading(false);
+                    }
+                    eventSource.close();
+                };
+
+                eventSource.onopen = () => {
+                    setLoading(false);
+                };
+
+                eventSource.addEventListener('end', () => {
+                    updateBotMessage(currentBotMessage);
+                    eventSource.close();
+                    setLoading(false);
+                    scrollToBottom();
+                });
+
             } catch (error) {
-                console.error('Error fetching chatbot response:', error);
+                console.error('Error fetching response:', error);
                 appendMessage('Failed to get response from server.', 'bot');
-            } finally {
                 setLoading(false);
             }
+        }
+    }
+
+    function updateBotMessage(text) {
+        const lastMessage = chatBody.lastElementChild;
+        if (lastMessage && lastMessage.classList.contains('widget-bot-message')) {
+            lastMessage.innerHTML = marked.parse(text);
+        } else {
+            appendMessage(text, 'bot');
         }
     }
 
@@ -172,6 +211,10 @@ function initializeChatWidget() {
         }
 
         chatBody.appendChild(messageElement);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
@@ -181,7 +224,7 @@ function initializeChatWidget() {
             loadingDots.className = 'loading-dots';
             loadingDots.innerHTML = '<div></div><div></div><div></div>';
             chatBody.appendChild(loadingDots);
-            chatBody.scrollTop = chatBody.scrollHeight;
+            scrollToBottom();
         } else {
             const loadingDots = document.querySelector('.loading-dots');
             if (loadingDots) {
