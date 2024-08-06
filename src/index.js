@@ -30,7 +30,7 @@ function initializeChatWidget() {
             <div class="chat-header-title">
                 <span class="chat-title">Chat with us!</span>
                 <button class="close-btn close-chat-widget-icon">X</button>
-            </div>         
+            </div>
         </div>
         <div class="chat-body"></div>
         <div class="chat-footer">
@@ -152,9 +152,15 @@ function initializeChatWidget() {
             try {
                 const eventSource = new EventSource(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
 
+                let isFirstMessage = true;
+
                 eventSource.onmessage = (event) => {
                     const chunk = event.data;
                     if (chunk !== 'end of response') {
+                        if (isFirstMessage) {
+                            setLoading(false);
+                            isFirstMessage = false;
+                        }
                         const parsedChunk = chunk.replace(/<newline>/g, '\n');
                         currentBotMessage += parsedChunk;
                         updateBotMessage(currentBotMessage);
@@ -164,15 +170,11 @@ function initializeChatWidget() {
 
                 eventSource.onerror = (error) => {
                     console.error('Error fetching response:', error);
-                    if (loading) {
+                    if (isFirstMessage) {
                         appendMessage('Failed to get response from server.', 'bot');
                         setLoading(false);
                     }
                     eventSource.close();
-                };
-
-                eventSource.onopen = () => {
-                    setLoading(false);
                 };
 
                 eventSource.addEventListener('end', () => {
@@ -181,6 +183,15 @@ function initializeChatWidget() {
                     setLoading(false);
                     scrollToBottom();
                 });
+
+                // Set a timeout to close the connection if no message is received
+                setTimeout(() => {
+                    if (isFirstMessage) {
+                        setLoading(false);
+                        appendMessage('No response received from server.', 'bot');
+                        eventSource.close();
+                    }
+                }, 10000); // 10 seconds timeout
 
             } catch (error) {
                 console.error('Error fetching response:', error);
