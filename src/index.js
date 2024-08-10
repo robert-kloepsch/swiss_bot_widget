@@ -1,5 +1,9 @@
 import './widget.css';
 
+function getBrowserLanguage() {
+    return navigator.language || navigator.userLanguage || 'en';
+}
+
 function initializeChatWidget() {
     const container = document.getElementById('chat-widget-container');
     if (!container) {
@@ -14,6 +18,9 @@ function initializeChatWidget() {
         console.error('User ID not found');
         return;
     }
+
+    const browserLanguage = getBrowserLanguage();
+    console.log(browserLanguage)
 
     const chatWidgetIcon = document.createElement('div');
     chatWidgetIcon.className = 'chat-widget-icon';

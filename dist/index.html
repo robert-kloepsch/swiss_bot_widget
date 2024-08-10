@@ -1,23 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Widget</title>
-<script defer src="bundle.js"></script></head>
-<body>
-  <div class="chat-widget-icon">💬</div>
-  <div class="chat-window hidden">
-    <div class="chat-header">
-      <span class="chat-title">Swiss Chatbot Factory!</span>
-      <button class="close-btn close-chat-widget-icon">X</button>
-    </div>
-    <div class="chat-body"></div>
-    <div class="chat-footer">
-      <input type="text" class="chat-input" placeholder="Type your message...">
-      <button class="send-message"><i class="widget-send-icon">Send</i></button>
-    </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-</body>
-</html>
+<head><script defer src="bundle.js"></script></head>Html Webpack Plugin:
+<pre>
+  Error: Child compilation failed:
+  Module not found: Error: Can't resolve 'C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_  widget\src\index.html' in 'C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget'
+  ModuleNotFoundError: Module not found: Error: Can't resolve 'C:\Users\rober\Desktop\Privat\Projekte  \swiss_bot\swiss_bot_widget\src\index.html' in 'C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\sw  iss_bot_widget'
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\C  ompilation.js:2100:28
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:904:13
+      at eval (eval at create (C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node  _modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:10:1)
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:341:22
+      at eval (eval at create (C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node  _modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:9:1)
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:518:22
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:151:11
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:776:25
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:988:8
+      at C:\Users\rober\Desktop\Privat\Projekte\swiss_bot\swiss_bot_widget\node_modules\webpack\lib\N  ormalModuleFactory.js:1118:5
+  
+  - Compilation.js:2100 
+    [swiss_bot_widget]/[webpack]/lib/Compilation.js:2100:28
+  
+  - NormalModuleFactory.js:904 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:904:13
+  
+  
+  - NormalModuleFactory.js:341 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:341:22
+  
+  
+  - NormalModuleFactory.js:518 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:518:22
+  
+  - NormalModuleFactory.js:151 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:151:11
+  
+  - NormalModuleFactory.js:776 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:776:25
+  
+  - NormalModuleFactory.js:988 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:988:8
+  
+  - NormalModuleFactory.js:1118 
+    [swiss_bot_widget]/[webpack]/lib/NormalModuleFactory.js:1118:5
+  
+  - child-compiler.js:174 
+    [swiss_bot_widget]/[html-webpack-plugin]/lib/child-compiler.js:174:18
+  
+  - Compiler.js:625 finalCallback
+    [swiss_bot_widget]/[webpack]/lib/Compiler.js:625:5
+  
+  - Compiler.js:660 
+    [swiss_bot_widget]/[webpack]/lib/Compiler.js:660:11
+  
+  - Compiler.js:1349 
+    [swiss_bot_widget]/[webpack]/lib/Compiler.js:1349:17
+  
+  
+  - Hook.js:18 Hook.CALL_ASYNC_DELEGATE [as _callAsync]
+    [swiss_bot_widget]/[tapable]/lib/Hook.js:18:14
+  
+  - Compiler.js:1345 
+    [swiss_bot_widget]/[webpack]/lib/Compiler.js:1345:33
+  
+  - Compilation.js:2906 finalCallback
+    [swiss_bot_widget]/[webpack]/lib/Compilation.js:2906:11
+  
+  - Compilation.js:3215 
+    [swiss_bot_widget]/[webpack]/lib/Compilation.js:3215:11
+  
+  
+</pre>
