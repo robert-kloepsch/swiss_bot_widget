@@ -16,16 +16,17 @@ body, html {
     right: 25px;
     color: white;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 75px;
+    height: 75px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 28px;
+    font-size: 36px;
     z-index: 999998 !important;
     animation: pulse 2s infinite;
+    padding-bottom: 3px;
 }
 
 @keyframes pulse {
