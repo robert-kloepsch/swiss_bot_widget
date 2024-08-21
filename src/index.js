@@ -106,14 +106,14 @@ function initializeChatWidget() {
         chatWindow.classList.remove('show');
         chatOverlay.classList.add('hidden');
         document.body.classList.remove('no-scroll');
-        setTimeout(() => chatWindow.classList.add('hidden'), 500); // Match the transition duration
+        setTimeout(() => chatWindow.classList.add('hidden'), 500);
     });
 
     chatOverlay.addEventListener('click', function () {
         chatWindow.classList.remove('show');
         chatOverlay.classList.add('hidden');
         document.body.classList.remove('no-scroll');
-        setTimeout(() => chatWindow.classList.add('hidden'), 500); // Match the transition duration
+        setTimeout(() => chatWindow.classList.add('hidden'), 500);
     });
 
     sendMessageBtn.addEventListener('click', function () {
@@ -127,7 +127,7 @@ function initializeChatWidget() {
     });
 
     function forceReflow(element) {
-        element.offsetHeight; // Read the height to force a reflow
+        element.offsetHeight;
     }
 
     function generateSessionId() {
@@ -154,55 +154,79 @@ function initializeChatWidget() {
             appendMessage(message, 'user');
             chatInput.value = '';
             setLoading(true);
-            currentBotMessage = '';
+            let currentBotMessage = '';
+
+            const maxRetries = 3;
+            let retryCount = 0;
+
+            const attemptConnection = () => {
+                return new Promise((resolve, reject) => {
+                    const eventSource = new EventSource(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
+
+                    let isFirstMessage = true;
+                    let timeoutId;
+
+                    eventSource.onmessage = (event) => {
+                        const chunk = event.data;
+                        if (chunk !== 'end of response') {
+                            if (isFirstMessage) {
+                                setLoading(false);
+                                isFirstMessage = false;
+                                clearTimeout(timeoutId);
+                            }
+                            const parsedChunk = chunk.replace(/<newline>/g, '\n');
+                            currentBotMessage += parsedChunk;
+                            updateBotMessage(currentBotMessage);
+                            scrollToBottom();
+                        }
+                    };
+
+                    eventSource.onerror = (error) => {
+                        console.error('Error fetching response:', error);
+                        if (isFirstMessage) {
+                            reject(new Error('Failed to get response from server.'));
+                        }
+                        eventSource.close();
+                    };
+
+                    eventSource.addEventListener('end', () => {
+                        updateBotMessage(currentBotMessage);
+                        eventSource.close();
+                        setLoading(false);
+                        scrollToBottom();
+                        resolve();
+                    });
+
+                    timeoutId = setTimeout(() => {
+                        if (isFirstMessage) {
+                            eventSource.close();
+                            reject(new Error('No response received from server.'));
+                        }
+                    }, 7000);
+                });
+            };
+
+            const retryConnection = async () => {
+                while (retryCount < maxRetries) {
+                    try {
+                        await attemptConnection();
+                        return;
+                    } catch (error) {
+                        retryCount++;
+                        console.log(`Attempt ${retryCount} failed. Retrying...`);
+                        if (retryCount >= maxRetries) {
+                            setLoading(false);
+                            appendMessage(`Failed to get response after ${maxRetries} attempts.`, 'bot');
+                            throw error;
+                        }
+                    }
+                }
+            };
 
             try {
-                const eventSource = new EventSource(`https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`);
-
-                let isFirstMessage = true;
-
-                eventSource.onmessage = (event) => {
-                    const chunk = event.data;
-                    if (chunk !== 'end of response') {
-                        if (isFirstMessage) {
-                            setLoading(false);
-                            isFirstMessage = false;
-                        }
-                        const parsedChunk = chunk.replace(/<newline>/g, '\n');
-                        currentBotMessage += parsedChunk;
-                        updateBotMessage(currentBotMessage);
-                        scrollToBottom();
-                    }
-                };
-
-                eventSource.onerror = (error) => {
-                    console.error('Error fetching response:', error);
-                    if (isFirstMessage) {
-                        appendMessage('Failed to get response from server.', 'bot');
-                        setLoading(false);
-                    }
-                    eventSource.close();
-                };
-
-                eventSource.addEventListener('end', () => {
-                    updateBotMessage(currentBotMessage);
-                    eventSource.close();
-                    setLoading(false);
-                    scrollToBottom();
-                });
-
-                // Set a timeout to close the connection if no message is received
-                setTimeout(() => {
-                    if (isFirstMessage) {
-                        setLoading(false);
-                        appendMessage('No response received from server.', 'bot');
-                        eventSource.close();
-                    }
-                }, 10000); // 10 seconds timeout
-
+                await retryConnection();
             } catch (error) {
                 console.error('Error fetching response:', error);
-                appendMessage('Failed to get response from server.', 'bot');
                 setLoading(false);
             }
         }
