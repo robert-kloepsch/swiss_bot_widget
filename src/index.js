@@ -202,7 +202,7 @@ function initializeChatWidget() {
                             eventSource.close();
                             reject(new Error('No response received from server.'));
                         }
-                    }, 7000);
+                    }, 8000);
                 });
             };
 
