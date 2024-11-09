@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/index.js',
@@ -8,7 +7,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
-    publicPath: '/', // This will ensure all assets are referenced from the root path
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -18,18 +17,13 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
+        type: 'asset/resource', // This will automatically copy the image to 'dist'
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: './src/cloud.png', to: 'cloud.png' },
-      ],
     }),
   ],
   mode: 'development',
