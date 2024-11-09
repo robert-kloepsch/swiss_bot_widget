@@ -27,7 +27,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/cloud.png', to: 'cloud.png' },
+        { from: './src/cloud.png', to: 'cloud.png' },
       ],
     }),
   ],
