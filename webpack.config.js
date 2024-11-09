@@ -8,6 +8,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+    publicPath: '/', // This will ensure all assets are referenced from the root path
   },
   module: {
     rules: [
