@@ -1,4 +1,4 @@
-// import './widget.css';
+import './widget.css';
 
 function getBrowserLanguage() {
     return navigator.language || navigator.userLanguage || 'en';
