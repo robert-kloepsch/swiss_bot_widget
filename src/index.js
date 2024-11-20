@@ -24,7 +24,7 @@ function initializeChatWidget() {
 
     const chatWidgetIcon = document.createElement('div');
     chatWidgetIcon.className = 'chat-widget-icon';
-    chatWidgetIcon.innerHTML = `<img src="https://robert-kloepsch.github.io/swiss_bot_widget/dist/cloud.png" style="height: 100px; margin-top: 7px;">`;
+    chatWidgetIcon.innerHTML = `<img src="https://robert-kloepsch.github.io/swiss_bot_widget/dist/cloud.png" style="height: 92px; margin-top: 8px;">`;
 
     const chatOverlay = document.createElement('div');
     chatOverlay.className = 'chat-overlay hidden';
