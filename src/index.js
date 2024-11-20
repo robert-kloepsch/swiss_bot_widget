@@ -1,4 +1,4 @@
-import './widget.css';
+// import './widget.css';
 
 function getBrowserLanguage() {
     return navigator.language || navigator.userLanguage || 'en';
@@ -24,7 +24,7 @@ function initializeChatWidget() {
 
     const chatWidgetIcon = document.createElement('div');
     chatWidgetIcon.className = 'chat-widget-icon';
-    chatWidgetIcon.innerHTML = `<img src="https://robert-kloepsch.github.io/swiss_bot_widget/dist/cloud.png" style="width: 60px; height: 60px; margin-top: 5px;">`;
+    chatWidgetIcon.innerHTML = `<img src="https://robert-kloepsch.github.io/swiss_bot_widget/dist/cloud.png" style="height: 100px; margin-top: 7px;">`;
 
     const chatOverlay = document.createElement('div');
     chatOverlay.className = 'chat-overlay hidden';
