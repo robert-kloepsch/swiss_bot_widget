@@ -42,7 +42,7 @@ function initializeChatWidget() {
         <div class="chat-body"></div>
         <div class="chat-footer">
             <div class="powered-by">
-                <span class="powered-by-text" onclick="window.open('http://landing.swiss-bot.com/', '_blank')">Powered by Swiss Chatbot Factory</span>
+                <span class="powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">Powered by Swiss AI Chatbot Factory</span>
             </div>
             <div class="input-send-container">
                 <input type="text" class="chat-input" placeholder="Type your message...">
