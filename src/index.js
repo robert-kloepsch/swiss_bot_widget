@@ -138,7 +138,7 @@ function initializeChatWidget() {
 
     async function fetchWelcomeMessage() {
         try {
-            const response = await fetch(`https://chat.swiss-bot.com/api/welcome_message?bot_id=${botId}`);
+            const response = await fetch(`https://chat.swiss-bot.com/api/widget_configuration/${botId}`);
             const data = await response.json();
             const welcomeMessage = data.welcome_message || "Welcome to your virtual assistant! 😊 How can I assist you today?";
             appendMessage(welcomeMessage, 'bot');
