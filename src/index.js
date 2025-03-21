@@ -7,7 +7,7 @@ function getBrowserLanguage() {
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
-    const container = document.getElementById('saicf-chat-widget-container');
+    const container = document.getElementById('chat-widget-container');
     if (!container) {
         console.error('Chat widget container not found');
         return;
