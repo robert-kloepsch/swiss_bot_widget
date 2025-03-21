@@ -1,4 +1,4 @@
-import './widget.css';
+// import './widget.css';
 
 function getBrowserLanguage() {
     return navigator.language || navigator.userLanguage || 'en';
@@ -7,7 +7,7 @@ function getBrowserLanguage() {
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
-    const container = document.getElementById('chat-widget-container');
+    const container = document.getElementById('saicf-chat-widget-container');
     if (!container) {
         console.error('Chat widget container not found');
         return;
@@ -56,7 +56,7 @@ async function initializeChatWidget() {
      **********************************************************/
     // 1. Chat icon
     const chatWidgetIcon = document.createElement('div');
-    chatWidgetIcon.className = 'chat-widget-icon';
+    chatWidgetIcon.className = 'saicf-chat-widget-icon';
     if (isPulsing) {
         chatWidgetIcon.classList.add('pulsing');
     }
@@ -720,11 +720,11 @@ async function initializeChatWidget() {
 
     // 2. Overlay
     const chatOverlay = document.createElement('div');
-    chatOverlay.className = 'chat-overlay hidden';
+    chatOverlay.className = 'saicf-chat-overlay hidden';
 
     // 3. Chat window
     const chatWindow = document.createElement('div');
-    chatWindow.className = 'chat-window hidden';
+    chatWindow.className = 'saicf-chat-window hidden';
 
     // Build the header HTML, including "logo" if available
     const logoHTML = logo
@@ -732,13 +732,13 @@ async function initializeChatWidget() {
             style="height:24px;width:24px;border-radius:50%;object-fit:cover;"/>`
         : '';
     const headerHTML = `
-        <div class="chat-header" style="background-color:${themeColor};">
-        <div class="chat-header-title">
-            <div class="logo-message-container">
+        <div class="saicf-chat-header" style="background-color:${themeColor};">
+        <div class="saicf-chat-header-title">
+            <div class="saicf-logo-message-container">
             ${logoHTML}
-            <span class="chat-title" style="color:${headerFontColor};">Chat with us!</span>
+            <span class="saicf-chat-title" style="color:${headerFontColor};">Chat with us!</span>
             </div>
-            <button class="close-btn close-chat-widget-icon" style="color:${headerFontColor};">
+            <button class="saicf-close-btn saicf-close-chat-widget-icon" style="color:${headerFontColor};">
             X
             </button>
         </div>
@@ -747,17 +747,17 @@ async function initializeChatWidget() {
 
     chatWindow.innerHTML = `
         ${headerHTML}
-        <div class="chat-body"></div>
-        <div class="chat-footer">
-        <div class="powered-by">
-            <span class="powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">
+        <div class="saicf-chat-body"></div>
+        <div class="saicf-chat-footer">
+        <div class="saicf-powered-by">
+            <span class="saicf-powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">
             Powered by Swiss AI Chatbot Factory
             </span>
         </div>
-        <div class="input-send-container">
-            <input type="text" class="chat-input" placeholder="Type your message...">
-            <button class="send-message" style="background-color:${themeColor};">
-            <i class="widget-send-icon">Send</i>
+        <div class="saicf-input-send-container">
+            <input type="text" class="saicf-chat-input" placeholder="Type your message...">
+            <button class="saicf-send-message" style="background-color:${themeColor};">
+            <i class="saicf-widget-send-icon">Send</i>
             </button>
         </div>
         </div>
@@ -781,13 +781,13 @@ async function initializeChatWidget() {
     // 5. Inject dynamic styles (hover color, user message color, etc.)
     const style = document.createElement('style');
     style.innerHTML = `
-        .chat-footer button.send-message:hover {
+        .saicf-chat-footer button:hover {
         background-color: ${hoverColor} !important;
         }
         .widget-user-message {
         background-color: ${themeColor} !important;
         }
-        .loading-dots div {
+        .saicf-loading-dots div {
         background-color: ${themeColor} !important;
         }
     `;
@@ -796,10 +796,10 @@ async function initializeChatWidget() {
     /**********************************************************
      * Handlers
      **********************************************************/
-    const closeChatBtn   = chatWindow.querySelector('.close-btn');
-    const chatBody       = chatWindow.querySelector('.chat-body');
-    const chatInput      = chatWindow.querySelector('.chat-footer input');
-    const sendMessageBtn = chatWindow.querySelector('.send-message');
+    const closeChatBtn   = chatWindow.querySelector('.saicf-close-btn');
+    const chatBody       = chatWindow.querySelector('.saicf-chat-body');
+    const chatInput      = chatWindow.querySelector('.saicf-chat-footer input');
+    const sendMessageBtn = chatWindow.querySelector('.saicf-send-message');
 
     let sessionId = generateSessionId();
 
@@ -944,7 +944,7 @@ async function initializeChatWidget() {
 
     function appendMessage(text, sender) {
         const messageElement = document.createElement('div');
-        messageElement.className = `widget-message widget-${sender}-message`;
+        messageElement.className = `saicf-widget-message widget-${sender}-message`;
 
         if (sender === 'bot') {
         messageElement.innerHTML = marked.parse(text);
@@ -963,12 +963,12 @@ async function initializeChatWidget() {
     function setLoading(isLoading) {
         if (isLoading) {
         const loadingDots = document.createElement('div');
-        loadingDots.className = 'loading-dots';
+        loadingDots.className = 'saicf-loading-dots';
         loadingDots.innerHTML = '<div></div><div></div><div></div>';
         chatBody.appendChild(loadingDots);
         scrollToBottom();
         } else {
-        const loadingDots = chatBody.querySelector('.loading-dots');
+        const loadingDots = chatBody.querySelector('.saicf-loading-dots');
         if (loadingDots) {
             loadingDots.remove();
         }

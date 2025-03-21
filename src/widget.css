@@ -5,12 +5,12 @@ body, html {
     width: 100%;
 }
 
-.chat-window, .chat-window * {
+.saicf-chat-window, .saicf-chat-window * {
     font-family: Arial, sans-serif;
     font-weight: normal;
 }
 
-.chat-widget-icon {
+.saicf-chat-widget-icon {
     position: fixed;
     bottom: 25px;
     right: 25px;
@@ -44,11 +44,11 @@ body, html {
     animation: pulse 2s infinite;
 }
 
-.chat-title {
+.saicf-chat-title {
     font-size: 18px;
 }
 
-.chat-window {
+.saicf-chat-window {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -66,7 +66,7 @@ body, html {
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.chat-window.show {
+.saicf-chat-window.show {
     opacity: 1;
     transform: translateY(0);
 }
@@ -75,7 +75,7 @@ body, html {
     display: none;
 }
 
-.chat-header {
+.saicf-chat-header {
     color: white;
     padding: 10px;
     padding-left: 15px;
@@ -85,19 +85,19 @@ body, html {
     flex-direction: column;
 }
 
-.chat-header-title {
+.saicf-chat-header-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.logo-message-container {
+.saicf-logo-message-container {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.close-btn {
+.saicf-close-btn {
     background: none;
     border: none;
     color: white;
@@ -107,18 +107,18 @@ body, html {
     cursor: pointer;
 }
 
-.close-chat-widget-icon {
+.saicf-close-chat-widget-icon {
     font-size: 22px;
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.close-chat-widget-icon:hover {
+.saicf-close-chat-widget-icon:hover {
     transform: scale(1.2);
 }
 
-.chat-body {
+.saicf-chat-body {
     flex: 1;
     padding: 8px;
     padding-top: 0;
@@ -128,7 +128,7 @@ body, html {
     background-color: white;
 }
 
-.chat-footer {
+.saicf-chat-footer {
     display: flex;
     flex-direction: column;
     padding: 10px;
@@ -136,25 +136,25 @@ body, html {
     gap: 8px;
 }
 
-.powered-by {
+.saicf-powered-by {
     display: flex;
     justify-content: center;
 }
 
-.powered-by-text {
+.saicf-powered-by-text {
     font-size: 10px;
     color: rgb(146, 146, 146);
     cursor: pointer;
     text-decoration: underline;
 }
 
-.input-send-container {
+.saicf-input-send-container {
     display: flex;
     border-top: 1px solid #ccc;
     padding-top: 10px;
 }
 
-.chat-footer input {
+.saicf-chat-footer input {
     flex: 1;
     padding: 7px;
     border: 1px solid #ccc;
@@ -163,7 +163,7 @@ body, html {
     font-size: 16px;
 }
 
-.chat-footer button {
+.saicf-chat-footer button {
     margin-left: 10px;
     padding: 5px 10px;
     color: white;
@@ -173,11 +173,11 @@ body, html {
     font-size: 14px;
 }
 
-.chat-footer button:hover {
+.saicf-chat-footer button:hover {
     background-color: #0595d3;
 }
 
-.widget-message {
+.saicf-widget-message {
     max-width: 80%;
     margin: 5px 0;
     padding: 5px;
@@ -212,12 +212,12 @@ body, html {
     margin: 0;
 }
 
-.widget-send-icon {
+.saicf-widget-send-icon {
     font-size: 16px;
     font-style: normal;
 }
 
-.loading-dots {
+.saicf-loading-dots {
     display: flex;
     justify-content: left;
     align-items: center;
@@ -226,7 +226,7 @@ body, html {
     margin-bottom: 5px;
 }
 
-.loading-dots div {
+.saicf-loading-dots div {
     width: 8px;
     height: 8px;
     margin: 0 4px;
@@ -241,14 +241,14 @@ body, html {
     }
 }
 
-.loading-dots div:nth-child(2) {
+.saicf-loading-dots div:nth-child(2) {
     animation-delay: 0.2s;
 }
-.loading-dots div:nth-child(3) {
+.saicf-loading-dots div:nth-child(3) {
     animation-delay: 0.4s;
 }
 
-.chat-overlay {
+.saicf-chat-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -258,25 +258,25 @@ body, html {
 }
 
 /* Overriding alignment if config says left or elevated */
-.chat-widget-icon.align-left {
+.saicf-chat-widget-icon.align-left {
     left: 25px !important;
     right: auto !important;
 }
-.chat-widget-icon.elevated {
+.saicf-chat-widget-icon.elevated {
     bottom: 55px !important; /* 25 + 30 = 55 */
 }
 
-.chat-window.align-left {
+.saicf-chat-window.align-left {
     left: 20px !important;
     right: auto !important;
 }
 
-.chat-window.elevated {
+.saicf-chat-window.elevated {
     bottom: 50px !important; /* 20 + 30 = 50 */
 }
 
 @media (max-width: 768px) {
-    .chat-overlay {
+    .saicf-chat-overlay {
         position: fixed;
         top: 0;
         left: 0;
@@ -285,7 +285,7 @@ body, html {
         z-index: 999999;
     }
 
-    .chat-window {
+    .saicf-chat-window {
         position: fixed;
         left: 4%;
         bottom: 1%;
