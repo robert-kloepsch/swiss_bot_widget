@@ -36,6 +36,8 @@ async function initializeChatWidget() {
     const hoverColor          = widgetConfig.button_hover_color      || '#0595d3';
     const headerFontColor     = widgetConfig.header_font_color       || '#ffffff';
     const welcomeMessage      = widgetConfig.welcome_message         || "Welcome to your virtual assistant! 😊 How can I assist you today?";
+    const widgetHeaderText    = widgetConfig.header_text             || 'Chat with us!';
+    const widgetBorderRadius = widgetConfig.widget_border_radius     ?? 50;
     const logo                = widgetConfig.header_icon_path        || null;
     const icon                = widgetConfig.widget_icon_path        || null;
 
@@ -66,13 +68,17 @@ async function initializeChatWidget() {
         chatWidgetIcon.style.paddingBottom = "1px"
     }
 
+    if (widgetBorderRadius) {
+        chatWidgetIcon.style.borderRadius = `${widgetBorderRadius}%`;
+    }
+
     // If we have a custom icon, show it. Otherwise, show a fallback SVG.
     if (icon) {
         chatWidgetIcon.innerHTML = `
         <img
             src="${icon}"
             alt="Widget Icon"
-            style="max-width: 100%; max-height: 100%; border-radius: 50%;"
+            style="max-width: 100%; max-height: 100%; border-radius: ${widgetBorderRadius}%;"
         />
         `;
     } else {
@@ -736,7 +742,7 @@ async function initializeChatWidget() {
         <div class="saicf-chat-header-title">
             <div class="saicf-logo-message-container">
             ${logoHTML}
-            <span class="saicf-chat-title" style="color:${headerFontColor};">Chat with us!</span>
+            <span class="saicf-chat-title" style="color:${headerFontColor};">${widgetHeaderText}</span>
             </div>
             <button class="saicf-close-btn saicf-close-chat-widget-icon" style="color:${headerFontColor};">
             X

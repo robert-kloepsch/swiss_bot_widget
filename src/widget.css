@@ -38,7 +38,8 @@
 }
 
 .saicf-chat-title {
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .saicf-chat-window {
@@ -93,7 +94,7 @@
 .saicf-close-btn {
     background: none;
     border: none;
-    color: white;
+    color: rgb(218, 43, 43);
     margin: 0;
     padding: 0;
     outline: none;
@@ -101,14 +102,14 @@
 }
 
 .saicf-close-chat-widget-icon {
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .saicf-close-chat-widget-icon:hover {
-    transform: scale(1.2);
+    transform: scale(1.3);
 }
 
 .saicf-chat-body {
