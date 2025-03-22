@@ -242,14 +242,14 @@
     animation-delay: 0.4s;
 }
 
-.saicf-chat-overlay {
+/* .saicf-chat-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 99998;
-}
+} */
 
 /* Overriding alignment if config says left or elevated */
 .saicf-chat-widget-icon.align-left {
@@ -272,6 +272,7 @@
 @media (max-width: 768px) {
     .saicf-chat-overlay {
         position: fixed;
+        background: rgba(0, 0, 0, 0.2);
         top: 0;
         left: 0;
         width: 100%;
