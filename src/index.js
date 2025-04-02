@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
     loadFontAwesome();
+
+    marked.setOptions({
+        gfm: true,
+        breaks: true,
+        headerIds: false,
+    });
+
     const container = document.getElementById('chat-widget-container');
     if (!container) {
         console.error('Chat widget container not found');
@@ -961,13 +968,7 @@ async function initializeChatWidget() {
     function appendMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.className = `saicf-widget-message widget-${sender}-message`;
-
-        if (sender === 'bot') {
         messageElement.innerHTML = marked.parse(text);
-        } else {
-        messageElement.textContent = text;
-        }
-
         chatBody.appendChild(messageElement);
         scrollToBottom();
     }

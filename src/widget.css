@@ -1,6 +1,5 @@
-.saicf-chat-window, .saicf-chat-window * {
+.saicf-chat-window {
     font-family: Arial, sans-serif;
-    font-weight: normal;
 }
 
 .saicf-chat-widget-icon {
@@ -194,7 +193,7 @@
 .widget-bot-message {
     align-self: flex-start;
     background-color: #ffffff;
-    color: rgb(64, 64, 64);
+    color: rgb(43, 43, 43);
     border-radius: 8px;
     font-size: 16px;
 }
@@ -263,6 +262,68 @@
 .saicf-chat-window.elevated {
     bottom: 50px !important; /* 20 + 30 = 50 */
 }
+
+/* table styles */
+.saicf-widget-message table {
+    border-collapse: separate;
+    border-spacing: 0px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+    overflow: auto;
+}
+
+.saicf-widget-message th, .saicf-widget-message td {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: .35rem .50rem;
+    text-align: left;
+    font-size: 14px;
+}
+
+.saicf-widget-message th {
+    color: #000000;
+    background-color: rgba(0, 0, 0, 0.06);
+    border-right: 0;
+    padding: .5rem .50rem;
+}
+
+.saicf-widget-message th:last-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.saicf-widget-message th {
+    border-bottom: none;
+}
+
+.saicf-widget-message td {
+    border-bottom: 0px solid rgba(0, 0, 0, 0.08);
+}
+
+.saicf-widget-message td {
+    border-right: 0px solid rgba(0, 0, 0, 0.08);
+}
+
+.saicf-widget-message td:last-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.saicf-widget-message tr:first-child th:first-child {
+    border-top-left-radius: 8px; /* Rounded top left corner */
+}
+.saicf-widget-message tr:first-child th:last-child {
+    border-top-right-radius: 8px; /* Rounded top right corner */
+}
+.saicf-widget-message tr:last-child td:first-child {
+    border-bottom-left-radius: 8px; /* Rounded bottom left corner */
+}
+.saicf-widget-message tr:last-child td:last-child {
+    border-bottom-right-radius: 8px; /* Rounded bottom right corner */
+}
+
+.saicf-widget-message tr:last-child td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08); /* Adds bottom border back on all cells of the last row */
+}
+/*Table style ending*/
 
 @media (max-width: 768px) {
     .saicf-chat-overlay {
