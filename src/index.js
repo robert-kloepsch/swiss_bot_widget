@@ -755,17 +755,17 @@ async function initializeChatWidget() {
         ${headerHTML}
         <div class="saicf-chat-body"></div>
         <div class="saicf-chat-footer">
-        <div class="saicf-powered-by">
-            <span class="saicf-powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">
-            Powered by Swiss AI Chatbot Factory
-            </span>
-        </div>
-        <div class="saicf-input-send-container">
-            <input type="text" class="saicf-chat-input" placeholder="Type your message...">
-            <button class="saicf-send-message" style="background-color:${themeColor};">
-            <i class="saicf-widget-send-icon">Send</i>
-            </button>
-        </div>
+            <div class="saicf-powered-by">
+                <span class="saicf-powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">
+                    Powered by Swiss AI Chatbot Factory
+                </span>
+            </div>
+            <div class="saicf-input-send-container">
+                <input type="text" class="saicf-chat-input" placeholder="Type your message...">
+                <button class="saicf-send-message" style="background-color:${themeColor};">
+                    <i class="fa-solid fa-arrow-up saicf-widget-send-icon"></i>
+                </button>
+            </div>
         </div>
     `;
 
