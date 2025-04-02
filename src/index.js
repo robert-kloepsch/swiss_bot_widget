@@ -37,7 +37,7 @@ async function initializeChatWidget() {
     const headerFontColor     = widgetConfig.header_font_color       || '#ffffff';
     const welcomeMessage      = widgetConfig.welcome_message         || "Welcome to your virtual assistant! 😊 How can I assist you today?";
     const widgetHeaderText    = widgetConfig.header_text             || 'Chat with us!';
-    const widgetBorderRadius = widgetConfig.widget_border_radius     ?? 50;
+    const widgetBorderRadius  = widgetConfig.widget_border_radius    ?? 50;
     const logo                = widgetConfig.header_icon_path        || null;
     const icon                = widgetConfig.widget_icon_path        || null;
 
@@ -68,7 +68,7 @@ async function initializeChatWidget() {
         chatWidgetIcon.style.paddingBottom = "1px"
     }
 
-    if (widgetBorderRadius) {
+    if (widgetBorderRadius != null) {
         chatWidgetIcon.style.borderRadius = `${widgetBorderRadius}%`;
     }
 
