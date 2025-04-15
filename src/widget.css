@@ -2,14 +2,18 @@
     font-family: Arial, sans-serif !important;
 }
 
+.saicf-chat-window p {
+    line-height: 1.3 !important;
+}
+
 .saicf-chat-widget-icon {
     position: fixed;
     bottom: 20px;
     right: 20px;
     color: white;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 75px;
+    height: 75px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -37,7 +41,7 @@
 }
 
 .saicf-chat-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -101,7 +105,7 @@
 }
 
 .saicf-close-chat-widget-icon {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -148,12 +152,13 @@
 }
 
 .saicf-chat-footer input {
-    flex: 1;
-    padding: 7px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline: none;
-    font-size: 16px;
+    flex: 1 !important;
+    padding: 7px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    outline: none !important;
+    font-size: 15px !important;
+    height: 22px !important;
 }
 
 .saicf-chat-footer button {
@@ -183,19 +188,19 @@
 }
 
 .widget-user-message {
-    align-self: flex-end;
-    color: white;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 16px;
+    align-self: flex-end !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+    font-size: 15px !important;
 }
 
 .widget-bot-message {
-    align-self: flex-start;
-    background-color: #ffffff;
-    color: rgb(43, 43, 43);
+    align-self: flex-start !important;
+    background-color: #ffffff !important;
+    color: rgb(43, 43, 43) !important;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px !important;
 }
 
 /* Remove margins from first/last child in user/bot messages */
@@ -351,11 +356,11 @@
     }
 
     .saicf-close-chat-widget-icon {
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .saicf-chat-title {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .widget-user-message {
