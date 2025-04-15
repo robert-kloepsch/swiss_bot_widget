@@ -198,6 +198,12 @@ async function initializeChatWidget() {
       border-radius: 8px;
       font-size: 15px !important;
     }
+    .widget-bot-message strong {
+      color: rgb(57, 57, 57);
+    }
+    .widget-bot-message ul li:not(:last-child) {
+      margin-bottom: 6px;
+    }
     .widget-user-message > :first-child,
     .widget-bot-message > :first-child {
       margin: 0;
