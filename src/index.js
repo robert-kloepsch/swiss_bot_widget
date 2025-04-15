@@ -4,20 +4,9 @@ function getBrowserLanguage() {
     return navigator.language || navigator.userLanguage || 'en';
 }
 
-function loadFontAwesome() {
-    if (!document.querySelector('link[href*="font-awesome"]')) {
-        const fa = document.createElement('link');
-        fa.rel = 'stylesheet';
-        fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css';
-        document.head.appendChild(fa);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
-    loadFontAwesome();
-
     marked.setOptions({
         gfm: true,
         breaks: true,
@@ -780,7 +769,9 @@ async function initializeChatWidget() {
             <div class="saicf-input-send-container">
                 <input type="text" class="saicf-chat-input" placeholder="Type your message...">
                 <button class="saicf-send-message" style="background-color:${themeColor};">
-                    <i class="fa-solid fa-arrow-up saicf-widget-send-icon"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" style="width: 16px; height: 16px; fill: white;">
+                        <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0L7 203.6c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 140.3V464c0 17.7 14.3 32 32 32s32-14.3 32-32V140.3l107.6 108.7c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L214.6 41.4z"/>
+                    </svg>
                 </button>
             </div>
         </div>
