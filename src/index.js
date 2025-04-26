@@ -5,6 +5,12 @@
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
+  if (!document.querySelector('meta[name="viewport"]')) {
+    const m = document.createElement('meta');
+    m.name = "viewport";
+    m.content = "width=device-width, initial-scale=1.0";
+    document.head.appendChild(m);
+  }
   // Grab the container
   const container = document.getElementById('chat-widget-container');
   if (!container) {
