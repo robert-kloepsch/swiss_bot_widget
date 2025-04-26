@@ -166,7 +166,7 @@ async function initializeChatWidget() {
       border: 1px solid #ccc !important;
       border-radius: 8px !important;
       outline: none !important;
-      font-size: 15px !important;
+      font-size: 16px !important;
     }
     .saicf-chat-footer button {
       display: flex;
