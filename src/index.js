@@ -5,13 +5,6 @@
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
-  if (!document.querySelector('meta[name="viewport"]')) {
-    const m = document.createElement('meta');
-    m.name = "viewport";
-    m.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-    document.head.appendChild(m);
-  }
-
   // Grab the container
   const container = document.getElementById('chat-widget-container');
   if (!container) {
@@ -27,6 +20,23 @@ async function initializeChatWidget() {
 
   // Attach a shadow root to #chat-widget-container
   const shadowRoot = container.attachShadow({ mode: 'open' });
+
+  if (!document.getElementById('saicf-global-scroll-style')) {
+    const globalScrollStyle = document.createElement('style');
+    globalScrollStyle.id = 'saicf-global-scroll-style';
+    globalScrollStyle.textContent = `
+      body.no-scroll,
+      html.no-scroll {
+        overflow: hidden !important;
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        touch-action: none !important;
+        overscroll-behavior: none !important;
+      }
+    `;
+    document.head.appendChild(globalScrollStyle);
+  }
 
   // Insert all widget CSS into the shadow root
   const styleTag = document.createElement('style');
@@ -82,7 +92,7 @@ async function initializeChatWidget() {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       display: flex !important;
       flex-direction: column;
-      z-index: 10000000 !important;
+      z-index: 2147483647 !important;
       opacity: 0;
       transform: translateY(100%);
       transition: opacity 0.5s ease, transform 0.5s ease;
@@ -1170,7 +1180,9 @@ async function initializeChatWidget() {
     forceReflow(chatWindow);
     chatWindow.classList.add('show');
     chatOverlay.classList.remove('hidden');
-    document.body.classList.add('no-scroll');
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      document.body.classList.add('no-scroll');
+    }
     // If no messages yet, show welcome
     if (chatBody.childElementCount === 0) {
       appendMessage(welcomeMessage, 'bot');
@@ -1199,7 +1211,9 @@ async function initializeChatWidget() {
   function closeChat() {
     chatWindow.classList.remove('show');
     chatOverlay.classList.add('hidden');
-    document.body.classList.remove('no-scroll');
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      document.body.classList.remove('no-scroll');
+    }
     setTimeout(() => chatWindow.classList.add('hidden'), 300);
   }
 
