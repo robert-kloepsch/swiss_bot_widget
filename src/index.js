@@ -8,9 +8,10 @@ async function initializeChatWidget() {
   if (!document.querySelector('meta[name="viewport"]')) {
     const m = document.createElement('meta');
     m.name = "viewport";
-    m.content = "width=device-width, initial-scale=1.0";
+    m.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
     document.head.appendChild(m);
   }
+
   // Grab the container
   const container = document.getElementById('chat-widget-container');
   if (!container) {
