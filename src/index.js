@@ -279,7 +279,7 @@ async function initializeChatWidget() {
       right: auto !important;
     }
     .saicf-chat-window.elevated {
-      bottom: 50px !important; /* 12 + 38 = 50 */
+      bottom: 12px !important; /* 12 + 38 = 50 */
     }
     /* table styles */
     .saicf-widget-message table {
