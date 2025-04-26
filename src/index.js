@@ -12,6 +12,10 @@ async function initializeChatWidget() {
     return;
   }
 
+  if (container.parentElement !== document.body) {
+    document.body.appendChild(container);
+  }
+
   container.style.position = 'relative';
   container.style.zIndex  = '2147483647';
 
