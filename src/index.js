@@ -12,6 +12,9 @@ async function initializeChatWidget() {
     return;
   }
 
+  container.style.position = 'relative';
+  container.style.zIndex  = '2147483647';
+
   const botId = container.getAttribute('data-user-id');
   if (!botId) {
     console.error('User ID not found (data-user-id is missing)');
