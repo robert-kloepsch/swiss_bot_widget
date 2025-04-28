@@ -6,6 +6,7 @@ console.log('Chat widget script loaded');
 document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
+  console.log('initializeChatWidget() called');
   // Grab the container
   const container = document.getElementById('chat-widget-container');
   if (!container) {
