@@ -3,7 +3,11 @@
  * Renders the chat widget in a Shadow DOM at #chat-widget-container
  *********************************************************/
 console.log('Chat widget script loaded');
-document.addEventListener('DOMContentLoaded', initializeChatWidget);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeChatWidget);
+} else {
+  initializeChatWidget();
+}
 
 async function initializeChatWidget() {
   console.log('initializeChatWidget() called');
