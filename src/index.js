@@ -2,7 +2,7 @@
  * index.js
  * Renders the chat widget in a Shadow DOM at #chat-widget-container
  *********************************************************/
-document.addEventListener('DOMContentLoaded', initializeChatWidget);
+// document.addEventListener('DOMContentLoaded', initializeChatWidget);
 
 async function initializeChatWidget() {
   // Grab the container
