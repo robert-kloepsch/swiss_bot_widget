@@ -2,36 +2,97 @@
  * index.js
  * Renders the chat widget in a Shadow DOM at #chat-widget-container
  *********************************************************/
-// console.log('Chat widget script loaded');
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeChatWidget);
-} else {
-  initializeChatWidget();
-}
+(function bootstrap() {
+  const POLL_INTERVAL = 200;   // ms between checks
+  const MAX_WAIT      = 30000; // safety timeout
+
+  let waited = 0;
+
+  function tryStart() {
+    const container = document.getElementById('chat-widget-container');
+
+    // When both the element and data-user-id are present we can go
+    if (container && container.getAttribute('data-user-id')) {
+      initializeChatWidget();
+      return;
+    }
+
+    // Otherwise keep polling (up to MAX_WAIT)
+    if (waited < MAX_WAIT) {
+      waited += POLL_INTERVAL;
+      setTimeout(tryStart, POLL_INTERVAL);
+    } else {
+      console.error(
+        'Chat widget bootstrap: #chat-widget-container not found ' +
+        `after ${MAX_WAIT / 1000}s - widget aborted`
+      );
+    }
+  }
+
+  // Start polling as soon as the DOM is available
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryStart);
+  } else {
+    tryStart();
+  }
+})();
 
 async function initializeChatWidget() {
-  // Grab the container
+  /************  SEO / PERFORMANCE ADD-ON ① : pre-connect  ***********/
+  ['https://portal.swiss-bot.com', 'https://cdn.jsdelivr.net']
+    .forEach(h => {
+      if (!document.querySelector(`link[rel="preconnect"][href="${h}"]`)) {
+        const l = document.createElement('link');
+        l.rel = 'preconnect'; l.href = h; l.crossOrigin = ''; document.head.appendChild(l);
+      }
+    });
+  /*******************************************************************/
+  let markedReady = typeof marked !== 'undefined';
+
+  async function ensureMarked() {
+    if (markedReady) return;
+
+    // 👇 tell Webpack to leave this dynamic import alone
+    const mod = await import(/* webpackIgnore: true */
+      'https://cdn.jsdelivr.net/npm/marked@11.1.1/lib/marked.esm.js');
+
+    mod.marked.setOptions({ gfm: true, breaks: true, headerIds: false });
+    globalThis.marked = mod.marked;
+    markedReady = true;
+  }
+
   const container = document.getElementById('chat-widget-container');
-  if (!container) {
-    console.error('Chat widget container not found');
-    return;
-  }
+  if (!container) { console.error('Chat widget container not found'); return; }
 
-  if (container.parentElement !== document.body) {
-    document.body.appendChild(container);
-  }
-
-  container.style.position = 'relative';
-  container.style.zIndex  = '2147483647';
+  if (container.parentElement !== document.body) document.body.appendChild(container);
+  container.style.all = 'initial';
+  container.style.position = 'fixed';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '0';
+  container.style.height = '0';
+  container.style.zIndex = '2147483647';
+  container.style.pointerEvents = 'none';
 
   const botId = container.getAttribute('data-user-id');
-  if (!botId) {
-    console.error('User ID not found (data-user-id is missing)');
-    return;
+  if (!botId) { console.error('User ID not found (data-user-id is missing)'); return; }
+
+  const HIDE_POWERED_BY_IDS = [
+    '175312141824050790019FvXPU',
+  ];
+
+  const POPUP_KEY = `saicf-popup-seen-${botId}`;
+  let   popUpSeen = sessionStorage.getItem(POPUP_KEY) === '1';
+
+  function markPopUpSeen() {
+    if (!popUpSeen) {
+      popUpSeen = true;
+      sessionStorage.setItem(POPUP_KEY, '1');
+    }
   }
 
-  // Attach a shadow root to #chat-widget-container
   const shadowRoot = container.attachShadow({ mode: 'open' });
+  shadowRoot.host.setAttribute('lang', 'en');
 
   if (!document.getElementById('saicf-global-scroll-style')) {
     const globalScrollStyle = document.createElement('style');
@@ -50,19 +111,43 @@ async function initializeChatWidget() {
     document.head.appendChild(globalScrollStyle);
   }
 
-  // Insert all widget CSS into the shadow root
   const styleTag = document.createElement('style');
   styleTag.textContent = `
     /**********************************************************
      * Embedded widget.css (now isolated to this Shadow DOM)
      **********************************************************/
-    .saicf-chat-window {
-      font-family: Arial, sans-serif !important;
+
+    /* ───────── FULL ISOLATION: kill any inherited styles ───────── */
+    :host {
+      all: initial;
+      box-sizing: border-box;
+      font-family: "DM Sans", sans-serif;
+      z-index: 2147483647 !important;
+      position: fixed !important;   /* 👈 add this */
+      top: 0; left: 0; width: 0; height: 0;
+      pointer-events: none;
     }
+
+    .saicf-chat-window,
+    .saicf-chat-widget-icon,
+    .saicf-pop-up-container { pointer-events: auto; }
+
+    /* keep border‑box for everything inside */
+    :host *, :host *::before, :host *::after {
+      box-sizing: inherit;
+    }
+
+    :host, .saicf-chat-window, .saicf-chat-window * {
+      font-family: "DM Sans", sans-serif !important;
+    }
+
+    :host {
+      --widget-size: 80px; /* fallback – will be overwritten by JS */
+    }
+
     .saicf-chat-window p {
       line-height: 1.3 !important;
       font-size: 15px !important;
-      font-family: Arial, sans-serif !important;
     }
     .saicf-chat-widget-icon {
       position: fixed;
@@ -70,8 +155,8 @@ async function initializeChatWidget() {
       right: 20px;
       color: white;
       border-radius: 50%;
-      width: 75px;
-      height: 75px;
+      width: 100px;
+      height: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -96,8 +181,8 @@ async function initializeChatWidget() {
       position: fixed;
       bottom: 12px;
       right: 12px;
-      width: 400px;
-      height: 550px;
+      width: 430px;
+      height: 620px;
       background-color: transparent;
       border: none;
       border-radius: 16px;
@@ -143,10 +228,12 @@ async function initializeChatWidget() {
       cursor: pointer;
     }
     .saicf-close-chat-widget-icon {
-      font-size: 20px;
-      font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .saicf-close-chat-widget-icon .fa-xmark,
+    .saicf-close-chat-widget-icon svg {
+      font-size: 1.6rem;   /* or whatever looks right */
     }
     .saicf-close-chat-widget-icon:hover {
       transform: scale(1.2);
@@ -163,7 +250,7 @@ async function initializeChatWidget() {
     .saicf-chat-footer {
       display: flex;
       flex-direction: column;
-      padding: 10px;
+      // padding: 10px;
       background-color: white;
       gap: 8px;
     }
@@ -179,8 +266,9 @@ async function initializeChatWidget() {
     }
     .saicf-input-send-container {
       display: flex;
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
+      border-top: 1px solid #f1f1f1;
+      padding: 10px;
+      background-color: #fafafa;
     }
     .saicf-chat-footer input {
       flex: 1 !important;
@@ -235,11 +323,11 @@ async function initializeChatWidget() {
     }
     .widget-user-message > :first-child,
     .widget-bot-message > :first-child {
-      margin: 0;
+      margin-top: 0;
     }
     .widget-user-message > :last-child,
     .widget-bot-message > :last-child {
-      margin: 0;
+      margin-bottom: 0;
     }
     .saicf-widget-send-icon {
       font-size: 18px;
@@ -277,16 +365,15 @@ async function initializeChatWidget() {
       right: auto !important;
     }
     .saicf-chat-widget-icon.elevated {
-      bottom: 55px !important; /* 20 + 35 = 55 */
+      bottom: 70px !important;
     }
     .saicf-chat-window.align-left {
       left: 20px !important;
       right: auto !important;
     }
     .saicf-chat-window.elevated {
-      bottom: 12px !important; /* 12 + 38 = 50 */
+      bottom: 12px !important;
     }
-    /* table styles */
     .saicf-widget-message table {
       border-collapse: separate;
       border-spacing: 0px;
@@ -333,37 +420,243 @@ async function initializeChatWidget() {
     .saicf-widget-message tr:last-child td {
       border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     }
-    @media (max-width: 768px) {
-      .saicf-chat-overlay {
-        position: fixed;
-        background: rgba(0, 0, 0, 0.2);
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 999999;
-      }
+
+    /**********************************************************
+     * Pop-up message styles
+     **********************************************************/
+    .saicf-pop-up-container {
+      position: fixed;
+      right: 20px;
+      bottom: calc(30px + var(--widget-size));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999999;
+    }
+    .saicf-pop-up-container.hidden {
+      pointer-events: none;
+    }
+    .saicf-pop-up-container.align-left {
+      left: 25px !important;
+      right: auto !important;
+    }
+
+    .saicf-pop-up-container.elevated {
+      bottom: calc(80px + var(--widget-size));   /* 55 px (icon) + 10 px gap */
+    }
+
+    .saicf-pop-up-message {
+      background:rgb(250, 250, 250);
+      padding: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      font-size: 16px;
+      color: #000000;
+      max-width: 320px;
+      line-height: 1.3;
+      border: 1px solid rgb(232, 232, 232);
+      cursor: pointer;
+    }
+    .saicf-pop-up-close{
+      background:none;
+      border:none;
+      outline:none;
+      font-weight:500;
+      color:rgb(163,163,163);
+      align-self:flex-end;
+      cursor:pointer;
+      margin-bottom:0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .saicf-pop-up-close:hover{
+      transform: scale(1.05);
+    }
+
+    .saicf-pop-up-close{
+      opacity:0;
+      pointer-events:none;
+    }
+    .saicf-pop-up-close.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .saicf-pop-up-message{
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .4s ease, transform .4s ease;
+    }
+    .saicf-pop-up-message.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    /* ───────── predefined-question chips ───────── */
+    .saicf-predefined-container{
+      display:flex;
+      flex-wrap:wrap-reverse;
+      justify-content: flex-end;
+      gap:8px;
+      padding:6px 10px;
+      padding-bottom: 0;
+      background: white;
+    }
+
+    .saicf-predefined-container::-webkit-scrollbar{display:none;}
+
+    .saicf-predefined-question{
+      flex:0 0 auto;
+      border: 1px solid #e8e8e8ff;
+      background: transparent;
+      color:#333;
+      border-radius:20px;
+      padding:6px 12px;
+      font-size:14px;
+      white-space:nowrap;
+      cursor:pointer;
+      transition:background-color .25s,transform .2s;
+    }
+    .saicf-predefined-question:hover{
+      background: #f1f1f1ff;
+      transform:translateY(-1px);
+    }
+
+    /* ——— busy/disabled visuals ——— */
+    .saicf-send-message[disabled] {
+      opacity: .5 !important;
+      cursor: not-allowed !important;
+    }
+    .saicf-chat-footer input:disabled {
+      background: #f5f5f5 !important;
+      cursor: not-allowed !important;
+    }
+    .saicf-predefined-question.is-disabled {
+      opacity: .5 !important;
+      pointer-events: none !important;
+    }
+
+    /* ───────── Header actions: close "X" + three-dots menu ───────── */
+    .saicf-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative; /* anchor menu below */
+    }
+
+    .saicf-ellipsis-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 4px;
+      margin: 0;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color .2s ease, transform .2s ease;
+      font-size: 20px;
+    }
+    .saicf-ellipsis-btn:hover { transform: scale(1.08); }
+    .saicf-ellipsis-btn svg { width: 1.2em; height: 1.2em; display: block; }
+
+    .saicf-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 160px;
+      background: #fff;
+      color: #1f2937;
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.15);
+      border-radius: 10px;
+      padding: 6px;
+      z-index: 2147483647; /* above header */
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .15s ease, transform .15s ease;
+    }
+    .saicf-menu.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .saicf-menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      color: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .saicf-menu-item:hover { background: #f3f4f6; }
+
+    .saicf-menu-item svg { width: 1em; height: 1em; display: block; }
+
+    @media (min-width: 769px) {
       .saicf-chat-window {
-        position: fixed;
-        left: 4%;
-        bottom: 1%;
-        width: 92%;
-        height: 90%;
-        border-radius: 16px;
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        width: min(430px, calc(100svw - 24px));
+        height: min(620px, calc(100svh - 24px));
+        max-height: calc(100svh - 24px);
       }
-      body.no-scroll {
-        overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      /* Hide the dim overlay; the window itself covers the screen */
+      .saicf-chat-overlay {
+        display: none !important;
       }
+
+      /* Fullscreen chat window (slides up when .show is added) */
+      .saicf-chat-window {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+        opacity: 0 !important;
+        transform: translateY(100%) !important;
+        transition: opacity 0.75s ease, transform 0.75s ease !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      /* When opened */
+      .saicf-chat-window.show {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      /* Internal pieces tuned for fullscreen */
+      .saicf-chat-window .saicf-chat-header {
+        border-radius: 0 !important;
+      }
+
+      .saicf-chat-header {
+        padding: 15px 8px;
+      }
+      .saicf-chat-window .saicf-chat-body {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      /* Keep your existing mobile sizing for other bits */
       .saicf-close-chat-widget-icon {
         font-size: 22px;
       }
       .saicf-chat-title {
         font-size: 16px;
       }
-      .widget-user-message {
-        font-size: 17px;
-      }
+      .widget-user-message,
       .widget-bot-message {
         font-size: 17px;
       }
@@ -371,18 +664,26 @@ async function initializeChatWidget() {
         width: 70px;
         height: 70px;
       }
+      .saicf-pop-up-container {
+        right: 20px;
+        bottom: calc(30px + var(--widget-size));
+      }
+      .saicf-pop-up-container.align-left {
+        left: 20px !important;
+        right: auto !important;
+      }
+      .saicf-pop-up-message {
+        padding: 7px 10px;
+        font-size: 14px;
+      }
     }
   `;
   shadowRoot.appendChild(styleTag);
 
-  // Container for the widget elements (icon, chat window, etc.)
-  // This is separate from #chat-widget-container so we can easily
-  // attach children inside the shadow root.
   const widgetRoot = document.createElement('div');
   widgetRoot.id = 'widget-root';
   shadowRoot.appendChild(widgetRoot);
 
-  // If you use 'marked' for markdown, set your options:
   if (typeof marked !== 'undefined') {
     marked.setOptions({
       gfm: true,
@@ -391,36 +692,77 @@ async function initializeChatWidget() {
     });
   }
 
-  /**********************************************************
-   * Helper function
-   **********************************************************/
-  function getBrowserLanguage() {
-    return navigator.language || navigator.userLanguage || 'en';
-  }
-  const browserLanguage = getBrowserLanguage();
-
-  // Fetch widget configuration
-  let widgetConfig = {};
+  let widgetConfig;
   try {
-    const response = await fetch(`https://chat.swiss-bot.com/api/widget_configuration/${botId}`);
-    widgetConfig = await response.json();
-  } catch (error) {
-    console.error('Error fetching widget configuration:', error);
+    const hostPageUrl = encodeURIComponent(window.location.href);
+
+    const res = await fetch(
+      `http://localhost:5000/api/widget_configuration/${botId}?host_url=${hostPageUrl}`,
+      { cache: 'no-store' }
+    );
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    widgetConfig = await res.json();
+  } catch (err) {
+    console.error('Widget config load failed – widget aborted', err);
+
+    if (!HIDE_POWERED_BY_IDS.includes(botId)) {
+      const backlink = document.createElement('a');
+      backlink.href = 'https://swiss-ai-chatbot.com/';
+      backlink.target = '_blank';
+      backlink.rel = 'noopener';
+      backlink.textContent =
+        'This website is powered by smart AI chatbots from Swiss AI Chatbot Factory.';
+
+      backlink.style.display = 'block';
+      backlink.style.textAlign = 'center';
+      backlink.style.fontSize = '8px';
+      backlink.style.opacity = '0.01';
+      backlink.style.textDecoration = 'none';
+      backlink.style.color = 'inherit';
+
+      document.body.appendChild(backlink);
+    }
+
+    return;
   }
 
-  /**********************************************************
-   * Extract config values
-   **********************************************************/
+  if (!HIDE_POWERED_BY_IDS.includes(botId)) {
+    const backlink = document.createElement('a');
+    backlink.href = 'https://swiss-ai-chatbot.com/';
+    backlink.target = '_blank';
+    backlink.rel = 'noopener';
+    backlink.textContent =
+      'This website is powered by smart AI chatbots from Swiss AI Chatbot Factory.';
+
+    backlink.style.display = 'block';
+    backlink.style.textAlign = 'center';
+    backlink.style.fontSize = '8px';
+    backlink.style.opacity = '0.01';
+    backlink.style.textDecoration = 'none';
+    backlink.style.color = 'inherit';
+
+    document.body.appendChild(backlink);
+  }
+
   const themeColor          = widgetConfig.theme_color             || '#0082ba';
   const hoverColor          = widgetConfig.button_hover_color      || '#0595d3';
   const headerFontColor     = widgetConfig.header_font_color       || '#ffffff';
-  const welcomeMessage      = widgetConfig.welcome_message         || "Welcome to your virtual assistant! 😊 How can I assist you today?";
+  const welcomeMessages     = widgetConfig.welcome_message
+            ? Array.isArray(widgetConfig.welcome_message)
+              ? widgetConfig.welcome_message
+              : [widgetConfig.welcome_message]
+            : [""];
   const widgetHeaderText    = widgetConfig.header_text             || 'Chat with us!';
   const widgetBorderRadius  = widgetConfig.widget_border_radius    ?? 50;
+  const widgetSize          = widgetConfig.widget_size             ?? 75;
   const logo                = widgetConfig.header_icon_path        || null;
   const icon                = widgetConfig.widget_icon_path        || null;
+  const popUpDelaySeconds   = widgetConfig.pop_up_delay_seconds    ?? 2;
+  const popUpMessages       = widgetConfig.pop_up_messages         ?? false;
 
-  // Pulsing
   let isPulsing = false;
   if (typeof widgetConfig.pulsing === 'boolean') {
     isPulsing = widgetConfig.pulsing;
@@ -428,20 +770,14 @@ async function initializeChatWidget() {
     isPulsing = widgetConfig.pulsing.toLowerCase() === 'true';
   }
 
-  // Alignment
-  const horizontalAlignment = widgetConfig.widget_horizontal_alignment || 'right'; // 'left' or 'right'
-  const verticalAlignment   = widgetConfig.widget_vertical_alignment   || 'bottom'; // 'bottom' or 'elevated'
+  const horizontalAlignment = widgetConfig.widget_horizontal_alignment || 'right';
+  const verticalAlignment   = widgetConfig.widget_vertical_alignment   || 'bottom';
 
-  /**********************************************************
-   * Build DOM elements inside Shadow DOM
-   **********************************************************/
-  // 1. Chat icon
   const chatWidgetIcon = document.createElement('div');
   chatWidgetIcon.className = 'saicf-chat-widget-icon';
   if (isPulsing) {
     chatWidgetIcon.classList.add('pulsing');
   }
-  // If no icon, default background color. Otherwise show custom icon
   if (!icon) {
     chatWidgetIcon.style.backgroundColor = themeColor;
     chatWidgetIcon.style.paddingBottom = '1px';
@@ -449,18 +785,22 @@ async function initializeChatWidget() {
   if (widgetBorderRadius != null) {
     chatWidgetIcon.style.borderRadius = `${widgetBorderRadius}%`;
   }
+  if (widgetSize != null) {
+    chatWidgetIcon.style.height = `${widgetSize}px`;
+    chatWidgetIcon.style.width = `${widgetSize}px`;
+
+    container.style.setProperty('--widget-size', `${widgetSize}px`);
+  }
   if (icon) {
     chatWidgetIcon.innerHTML = `
       <img
         src="${icon}"
         alt="Widget Icon"
-        style="max-width: 100%; max-height: 100%; border-radius: ${widgetBorderRadius}%;"
-      />
+        style="max-width: 100%; max-height: 100%; border-radius: ${widgetBorderRadius}%;">
     `;
   } else {
-    // A fallback SVG
     chatWidgetIcon.innerHTML = `
-        <div style="display:flex; justify-content:center; align-items:center; background-color: transparent">
+      <div style="display:flex; justify-content:center; align-items:center; background-color: transparent">
             <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
             width="100%" viewBox="0 0 1048 1048" enableBackground="new 0 0 1048 1048">
             <path fill="none" opacity="1.000000" stroke="none"
@@ -1099,19 +1439,15 @@ async function initializeChatWidget() {
         </div>
     `;
   }
-
-  // 2. Overlay
   const chatOverlay = document.createElement('div');
   chatOverlay.className = 'saicf-chat-overlay hidden';
 
-  // 3. Chat window
   const chatWindow = document.createElement('div');
   chatWindow.className = 'saicf-chat-window hidden';
 
-  // Build the header HTML
   const logoHTML = logo
     ? `<img src="${logo}" alt="Chat Logo"
-         style="height:24px;width:24px;border-radius:50%;object-fit:cover;"/>`
+         style="height:30px;width:30px;border-radius:50%;object-fit:cover;"/>`
     : '';
   const headerHTML = `
     <div class="saicf-chat-header" style="background-color:${themeColor};">
@@ -1120,25 +1456,60 @@ async function initializeChatWidget() {
           ${logoHTML}
           <span class="saicf-chat-title" style="color:${headerFontColor};">${widgetHeaderText}</span>
         </div>
-        <button class="saicf-close-btn saicf-close-chat-widget-icon" style="color:${headerFontColor};">
-          X
-        </button>
+
+        <div class="saicf-header-actions" aria-label="Chat actions">
+          <!-- three dots -->
+          <button class="saicf-ellipsis-btn" aria-label="More actions" title="More">
+            <svg viewBox="0 0 448 512" fill="${headerFontColor}">
+              <path d="M120 256a56 56 0 1 1-112 0 56 56 0 1 1 112 0zm160 0a56 56 0 1 1-112 0 56 56 0 1 1 112 0zm160 0a56 56 0 1 1-112 0 56 56 0 1 1 112 0z"/>
+            </svg>
+          </button>
+
+          <!-- close X (unchanged) -->
+          <button class="saicf-close-btn saicf-close-chat-widget-icon" aria-label="Close chat" style="color:${headerFontColor};">
+            <svg viewBox="0 0 384 512" style="height:1em;width:1em;fill:currentColor;">
+              <path d="M310.6 361.4 233.3 284l77.3-77.3c12.5-12.5 12.5-32.8 0-45.3-12.5-12.5-32.8-12.5-45.3 0L188 238.7 110.7 161.4c-12.5-12.5-32.8-12.5-45.3 0-12.5 12.5-12.5 32.8 0 45.3l77.3 77.3-77.3 77.3c-12.5 12.5-12.5 32.8 0 45.3 12.5 12.5 32.8 12.5 45.3 0L188 327.3l77.3 77.3c12.5 12.5 32.8 12.5 45.3 0 12.5-12.5 12.5-32.8 0-45.3z"/>
+            </svg>
+          </button>
+
+          <!-- dropdown menu -->
+          <div class="saicf-menu" role="menu" aria-hidden="true">
+            <button class="saicf-menu-item saicf-menu-item--clear" role="menuitem">
+              <svg viewBox="0 0 448 512" fill="currentColor">
+                <path d="M135.2 17.7c2.9-10.7 12.7-17.7 23.8-17.7h129.9c11.1 0 20.9 7.1 23.8 17.7L328 32H432c8.8 0 16 7.2 16 16s-7.2 16-16 16H416 32 16C7.2 64 0 56.8 0 48S7.2 32 16 32H120l15.2-14.3zM64 96H384l-21.2 355.9c-1.5 25.1-22.3 44.1-47.4 44.1H132.6c-25.1 0-45.9-19-47.4-44.1L64 96z"/>
+              </svg>
+              Clear chat
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `;
+  // Conditionally include the powered-by HTML
+  const poweredByHTML = HIDE_POWERED_BY_IDS.includes(botId)
+    ? ''
+    : `
+        <div class="saicf-powered-by">
+          <a class="saicf-powered-by-text"
+            href="https://swiss-ai-chatbot.com/"
+            target="_blank"
+            rel="noopener"
+            title="Our website uses intelligent chatbots powered by Swiss AI Chatbot Factory to improve customer service.">
+            Powered by Swiss AI Chatbot Factory
+          </a>
+        </div>
+      `;
+
   chatWindow.innerHTML = `
     ${headerHTML}
     <div class="saicf-chat-body"></div>
     <div class="saicf-chat-footer">
-      <div class="saicf-powered-by">
-        <span class="saicf-powered-by-text" onclick="window.open('http://swiss-bot.com/', '_blank')">
-          Powered by Swiss AI Chatbot Factory
-        </span>
-      </div>
+      <div class="saicf-predefined-container hidden"></div>
+      ${poweredByHTML}
       <div class="saicf-input-send-container">
         <input type="text" class="saicf-chat-input" placeholder="Type your message...">
-        <button class="saicf-send-message" style="background-color:${themeColor};">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" style="width: 16px; height: 16px; fill: white;">
+        <button class="saicf-send-message" style="background-color:${themeColor};" aria-label="Send message">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" style="width: 16px; height: 16px; fill: ${headerFontColor};">
             <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0L7 203.6c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 140.3V464c0 17.7 14.3 32 32 32s32-14.3 32-32V140.3l107.6 108.7c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L214.6 41.4z"/>
           </svg>
         </button>
@@ -1146,22 +1517,96 @@ async function initializeChatWidget() {
     </div>
   `;
 
-  // Append elements to the shadow root
+  const popUpContainer = document.createElement('div');
+
+  (function zoomWidgetForWixMobile () {
+    /* run only on narrow screens – skip desktop completely */
+    if (window.screen.width > 600) return;          // ← use screen.width here
+
+    const vp = document.querySelector('meta[name="viewport"][id="wixMobileViewport"]');
+    if (!vp) return;
+
+    const m = /width\s*=\s*(\d+)/i.exec(vp.content || '');
+    if (!m) return;
+
+    const forcedWidth = +m[1];                      // 320
+
+    const physical    = window.screen.width;        // ← real CSS-px of device
+    if (physical <= forcedWidth) return;            // e.g. old iPhone SE
+
+    const zoomFactor  = forcedWidth / physical;     // ≈ 0.74 on 375-px devices
+    console.log(zoomFactor)
+
+    /* zoom rescales visuals *and* hit-testing */
+    container.style.zoom = zoomFactor;              // all major browsers
+    container.style.setProperty('-moz-transform', `scale(${zoomFactor})`);
+    container.style.setProperty('-moz-transform-origin', 'top left');
+  })();
+
+  popUpContainer.className = 'saicf-pop-up-container hidden';
+
+  const popUpCloseBtn = document.createElement('button');
+  popUpCloseBtn.className = 'saicf-pop-up-close';
+  popUpCloseBtn.innerHTML = `
+    <svg viewBox="0 0 384 512" style="height:1.3em;width:1.3em;fill:currentColor;">
+      <path d="M310.6 361.4 233.3 284l77.3-77.3c12.5-12.5 12.5-32.8 0-45.3-12.5-12.5-32.8-12.5-45.3 0L188 238.7 110.7 161.4c-12.5-12.5-32.8-12.5-45.3 0-12.5 12.5-12.5 32.8 0 45.3l77.3 77.3-77.3 77.3c-12.5 12.5-12.5 32.8 0 45.3 12.5 12.5 32.8 12.5 45.3 0L188 327.3l77.3 77.3c12.5 12.5 32.8 12.5 45.3 0 12.5-12.5 12.5-32.8 0-45.3z"/>
+    </svg>
+  `;
+  popUpCloseBtn.style.backgroundColor = themeColor;
+  popUpCloseBtn.style.color = headerFontColor;
+  popUpCloseBtn.style.borderRadius = '50%';
+  popUpCloseBtn.style.padding = '0px';
+  popUpCloseBtn.style.width = '24px';
+  popUpCloseBtn.style.height = '24px';
+  popUpCloseBtn.style.display = 'flex';
+  popUpCloseBtn.style.alignItems = 'center';
+  popUpCloseBtn.style.justifyContent = 'center';
+  popUpContainer.appendChild(popUpCloseBtn);
+
+  welcomeMessages.forEach(msg => {
+    const msgEl = document.createElement('div');
+    msgEl.className = 'saicf-pop-up-message';
+    msgEl.innerHTML = msg.replace(/\n/g, '<br>');
+    popUpContainer.appendChild(msgEl);
+
+    // ✅ Click opens chat exactly like the widget icon
+    msgEl.addEventListener('click', () => {
+      ensureMarked().then(() => {
+        if (chatBody.childElementCount === 0) {
+          welcomeMessages.forEach(msg => appendMessage(msg, 'bot'));
+        }
+      });
+      chatWindow.classList.remove('hidden');
+      forceReflow(chatWindow);
+      chatWindow.classList.add('show');
+      chatOverlay.classList.remove('hidden');
+
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.body.classList.add('no-scroll');
+      }
+
+      widgetOpenedOnce = true;
+      markPopUpSeen();
+      hidePopUp();
+    });
+  });
+
   widgetRoot.appendChild(chatWidgetIcon);
   widgetRoot.appendChild(chatOverlay);
   widgetRoot.appendChild(chatWindow);
+  widgetRoot.appendChild(popUpContainer);
 
-  // 4. Alignment
   if (horizontalAlignment === 'left') {
     chatWidgetIcon.classList.add('align-left');
     chatWindow.classList.add('align-left');
+    popUpContainer.classList.add('align-left');
   }
   if (verticalAlignment === 'elevated') {
     chatWidgetIcon.classList.add('elevated');
     chatWindow.classList.add('elevated');
+    popUpContainer.classList.add('elevated');
   }
 
-  // 5. Inject dynamic styles (for hoverColor, themeColor, etc.)
   const dynamicStyleEl = document.createElement('style');
   dynamicStyleEl.textContent = `
     .saicf-chat-footer button:hover {
@@ -1176,18 +1621,139 @@ async function initializeChatWidget() {
   `;
   shadowRoot.appendChild(dynamicStyleEl);
 
-  /**********************************************************
-   * Handlers
-   **********************************************************/
   const closeChatBtn   = chatWindow.querySelector('.saicf-close-btn');
   const chatBody       = chatWindow.querySelector('.saicf-chat-body');
   const chatInput      = chatWindow.querySelector('.saicf-chat-footer input');
   const sendMessageBtn = chatWindow.querySelector('.saicf-send-message');
 
+  // ───────── three-dots menu wiring ─────────
+  const ellipsisBtn = chatWindow.querySelector('.saicf-ellipsis-btn');
+  const actionsWrap = chatWindow.querySelector('.saicf-header-actions');
+  const menu        = chatWindow.querySelector('.saicf-menu');
+  const clearBtn    = chatWindow.querySelector('.saicf-menu-item--clear');
+
+  // toggle menu open/close
+  function toggleMenu(open) {
+    const willOpen = typeof open === 'boolean' ? open : !menu.classList.contains('is-open');
+    menu.classList.toggle('is-open', willOpen);
+    menu.setAttribute('aria-hidden', String(!willOpen));
+  }
+
+  // close menu on outside click (inside shadow DOM)
+  shadowRoot.addEventListener('click', (e) => {
+    if (!menu.classList.contains('is-open')) return;
+    if (actionsWrap.contains(e.target)) return; // clicks on button/menu are fine
+    toggleMenu(false);
+  });
+
+  // also close on Escape
+  shadowRoot.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('is-open')) toggleMenu(false);
+  });
+
+  // open/close when tapping the dots
+  ellipsisBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // clear chat = new session + wipe messages (+ show welcome again)
+  clearBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleMenu(false);
+
+    // new session id
+    sessionId = generateSessionId();
+
+    // clear UI messages
+    chatBody.innerHTML = '';
+
+    // optional: also remove any "loading dots" if present
+    const loadingDots = chatBody.querySelector('.saicf-loading-dots');
+    if (loadingDots) loadingDots.remove();
+
+    // re-show welcome messages (if configured)
+    if (Array.isArray(welcomeMessages) && welcomeMessages.length) {
+      welcomeMessages.forEach(msg => appendMessage(msg, 'bot'));
+    }
+
+    // focus input for convenience
+    chatInput.focus();
+  });
+
+  // make sure menu never lingers when the chat closes
+  const _origCloseChat = closeChat;
+  closeChat = function () {
+    toggleMenu(false);
+    _origCloseChat();
+  };
+
+  let isBusy = false; // ← blocks any new user input while bot is responding
+
+  function getPredefinedChips() {
+    return Array.from(chatWindow.querySelectorAll('.saicf-predefined-question'));
+  }
+
+  function setBusy(b) {
+    isBusy = b;
+
+    // Inputs
+    chatInput.disabled = b;
+    sendMessageBtn.disabled = b;
+    chatInput.setAttribute('aria-disabled', String(b));
+    sendMessageBtn.setAttribute('aria-disabled', String(b));
+
+    // Predefined question chips
+    getPredefinedChips().forEach(chip => {
+      chip.classList.toggle('is-disabled', b);
+      chip.tabIndex = b ? -1 : 0;
+      chip.setAttribute('aria-disabled', String(b));
+    });
+  }
+
+  /* ───────── predefined‑question chips ───────── */
+  const predefinedContainer = chatWindow.querySelector('.saicf-predefined-container');
+
+  let predefinedQuestions = widgetConfig.predefined_questions ?? [];
+  try {
+    if (typeof predefinedQuestions === 'string') {
+      predefinedQuestions = JSON.parse(predefinedQuestions);
+    }
+  } catch {}
+
+  const hasRealQuestions =
+    Array.isArray(predefinedQuestions) &&
+    (predefinedQuestions.length > 1 ||
+    (predefinedQuestions.length === 1 && predefinedQuestions[0].trim() !== ''));
+
+  if (hasRealQuestions) {
+    predefinedContainer.classList.remove('hidden');
+
+    predefinedQuestions.forEach(q => {
+      if (!q) return;
+      const chip        = document.createElement('div');
+      chip.className    = 'saicf-predefined-question';
+      chip.textContent  = q;
+
+      chip.addEventListener('click', () => {
+        if (isBusy) return;          // ignore while streaming
+        chatInput.value = q;
+        sendMessage();
+      });
+
+      predefinedContainer.appendChild(chip);
+    });
+  }
+
   let sessionId = generateSessionId();
+  let widgetOpenedOnce = popUpSeen;
 
   chatWidgetIcon.addEventListener('click', () => {
-    // Show chat window
+    ensureMarked().then(() => {
+      if (chatBody.childElementCount === 0) {
+        welcomeMessages.forEach(msg => appendMessage(msg, 'bot'));
+      }
+    });
     chatWindow.classList.remove('hidden');
     forceReflow(chatWindow);
     chatWindow.classList.add('show');
@@ -1195,10 +1761,9 @@ async function initializeChatWidget() {
     if (window.matchMedia('(max-width: 768px)').matches) {
       document.body.classList.add('no-scroll');
     }
-    // If no messages yet, show welcome
-    if (chatBody.childElementCount === 0) {
-      appendMessage(welcomeMessage, 'bot');
-    }
+    widgetOpenedOnce = true;
+    markPopUpSeen();
+    hidePopUp();
   });
 
   closeChatBtn.addEventListener('click', () => {
@@ -1206,17 +1771,51 @@ async function initializeChatWidget() {
   });
 
   sendMessageBtn.addEventListener('click', () => {
+    if (isBusy) return;
     sendMessage();
   });
 
   chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
+      if (isBusy) { e.preventDefault(); return; }
       sendMessage();
     }
   });
 
+  popUpCloseBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    hidePopUp();
+    widgetOpenedOnce = true;
+    markPopUpSeen();
+  });
+
+  function showPopUpSequentially() {
+    if (widgetOpenedOnce || popUpSeen) return;
+    popUpContainer.classList.remove('hidden');
+
+    const msgs = popUpContainer.querySelectorAll('.saicf-pop-up-message');
+    msgs.forEach((msg, i) => {
+      setTimeout(() => {
+        msg.classList.add('show');
+        if (i === 0) {
+          popUpCloseBtn.classList.add('show');
+        }
+      }, i * 1200);
+    });
+  }
+
+  function hidePopUp() {
+    popUpContainer.classList.add('hidden');
+    popUpContainer.querySelectorAll('.saicf-pop-up-message')
+                  .forEach(m => m.classList.remove('show'));
+    popUpCloseBtn.classList.remove('show');
+  }
+
+  if (popUpMessages) {
+    setTimeout(showPopUpSequentially, popUpDelaySeconds * 1000);
+  }
+
   function forceReflow(element) {
-    // Force a reflow for transition
     void element.offsetHeight;
   }
 
@@ -1236,89 +1835,65 @@ async function initializeChatWidget() {
   }
 
   async function sendMessage() {
+    if (isBusy) return;                // ← guard against re-entry
+
     const message = chatInput.value.trim();
     if (!message) return;
 
+    // show the user’s message
     appendMessage(message, 'user');
     chatInput.value = '';
+
+    setBusy(true);
     setLoading(true);
 
     let currentBotMessage = '';
-    const maxRetries = 3;
-    let retryCount = 0;
 
-    const attemptConnection = () => {
-      return new Promise((resolve, reject) => {
-        const url = `https://chat.swiss-bot.com/api/chatbot_response?user_input=${encodeURIComponent(message)}&session_id=${sessionId}&bot_id=${botId}&language=english`;
-        const eventSource = new EventSource(url);
+    const url =
+      `http://localhost:5000/api/chatbot_response?` +
+      `user_input=${encodeURIComponent(message)}` +
+      `&session_id=${sessionId}&bot_id=${botId}&language=english`;
 
-        let isFirstMessage = true;
-        let timeoutId;
-
-        eventSource.onmessage = (event) => {
-          const chunk = event.data;
-          if (chunk !== 'end of response') {
-            if (isFirstMessage) {
-              setLoading(false);
-              isFirstMessage = false;
-              clearTimeout(timeoutId);
-            }
-            const parsedChunk = chunk.replace(/<newline>/g, '\n');
-            currentBotMessage += parsedChunk;
-            updateBotMessage(currentBotMessage);
-            scrollToBottom();
-          }
-        };
-
-        eventSource.onerror = (error) => {
-          console.error('Error fetching response:', error);
-          if (isFirstMessage) {
-            reject(new Error('Failed to get response from server.'));
-          }
-          eventSource.close();
-        };
-
-        // Listen for custom 'end' event
-        eventSource.addEventListener('end', () => {
-          updateBotMessage(currentBotMessage);
-          eventSource.close();
-          setLoading(false);
-          scrollToBottom();
-          resolve();
-        });
-
-        timeoutId = setTimeout(() => {
-          if (isFirstMessage) {
-            eventSource.close();
-            reject(new Error('No response received from server.'));
-          }
-        }, 8000);
-      });
-    };
-
-    const retryConnection = async () => {
-      while (retryCount < maxRetries) {
-        try {
-          await attemptConnection();
-          return;
-        } catch (error) {
-          retryCount++;
-          console.log(`Attempt ${retryCount} failed. Retrying...`);
-          if (retryCount >= maxRetries) {
-            setLoading(false);
-            appendMessage(`Failed to get response after ${maxRetries} attempts.`, 'bot');
-            throw error;
-          }
-        }
-      }
-    };
-
-    try {
-      await retryConnection();
-    } catch (error) {
-      console.error('Error fetching response:', error);
+    const finish = () => {
       setLoading(false);
-    }
+      setBusy(false);                  // ← re-enable everything only now
+      scrollToBottom();
+    };
+
+    return new Promise((resolve) => {
+      const es = new EventSource(url);
+      let firstChunk = true;
+
+      es.onmessage = ({ data: chunk }) => {
+        if (chunk === 'end of response') return;
+        if (firstChunk) {
+          setLoading(false);
+          firstChunk = false;
+        }
+        currentBotMessage += chunk.replace(/<newline>/g, '\n');
+        updateBotMessage(currentBotMessage);
+        scrollToBottom();
+      };
+
+      es.addEventListener('end', () => {
+        updateBotMessage(currentBotMessage);
+        es.close();
+        finish();
+        resolve();
+      });
+
+      es.addEventListener('error', (e) => {
+        if (e?.data === 'Timeout while generating response') {
+          es.close();
+          appendMessage(
+            'Sorry, the server took too long to respond. Please try again.',
+            'bot'
+          );
+          finish();
+          resolve();
+        }
+      });
+    });
   }
 
   function updateBotMessage(text) {
