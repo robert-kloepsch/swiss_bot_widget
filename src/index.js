@@ -697,7 +697,7 @@ async function initializeChatWidget() {
     const hostPageUrl = encodeURIComponent(window.location.href);
 
     const res = await fetch(
-      `http://localhost:5000/api/widget_configuration/${botId}?host_url=${hostPageUrl}`,
+      `https://portal.swiss-bot.com/api/widget_configuration/${botId}?host_url=${hostPageUrl}`,
       { cache: 'no-store' }
     );
 
@@ -1850,7 +1850,7 @@ async function initializeChatWidget() {
     let currentBotMessage = '';
 
     const url =
-      `http://localhost:5000/api/chatbot_response?` +
+      `https://portal.swiss-bot.com/api/chatbot_response?` +
       `user_input=${encodeURIComponent(message)}` +
       `&session_id=${sessionId}&bot_id=${botId}&language=english`;
 
