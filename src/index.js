@@ -1467,7 +1467,7 @@ async function initializeChatWidget() {
 
           <!-- close X (unchanged) -->
           <button class="saicf-close-btn saicf-close-chat-widget-icon" aria-label="Close chat" style="color:${headerFontColor};">
-            <svg viewBox="0 0 384 512" style="height:1em;width:1em;fill:currentColor;">
+            <svg viewBox="0 0 384 512" style="height:1.7rem;width:1.7rem;fill:currentColor;">
               <path d="M310.6 361.4 233.3 284l77.3-77.3c12.5-12.5 12.5-32.8 0-45.3-12.5-12.5-32.8-12.5-45.3 0L188 238.7 110.7 161.4c-12.5-12.5-32.8-12.5-45.3 0-12.5 12.5-12.5 32.8 0 45.3l77.3 77.3-77.3 77.3c-12.5 12.5-12.5 32.8 0 45.3 12.5 12.5 32.8 12.5 45.3 0L188 327.3l77.3 77.3c12.5 12.5 32.8 12.5 45.3 0 12.5-12.5 12.5-32.8 0-45.3z"/>
             </svg>
           </button>
