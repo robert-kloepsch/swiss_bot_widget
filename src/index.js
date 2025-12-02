@@ -1668,6 +1668,9 @@ async function initializeChatWidget() {
     // clear UI messages
     chatBody.innerHTML = '';
 
+    // clear stored history
+    sessionStorage.removeItem(CHAT_HISTORY_KEY);
+
     // optional: also remove any "loading dots" if present
     const loadingDots = chatBody.querySelector('.saicf-loading-dots');
     if (loadingDots) loadingDots.remove();
@@ -1745,8 +1748,33 @@ async function initializeChatWidget() {
     });
   }
 
+  const CHAT_HISTORY_KEY = `chat-history-${botId}`;
+
   let sessionId = generateSessionId();
   let widgetOpenedOnce = popUpSeen;
+
+  function restoreChatHistory() {
+    const stored = sessionStorage.getItem(CHAT_HISTORY_KEY);
+    if (!stored) return;
+    try {
+      const messages = JSON.parse(stored);
+      messages.forEach(({ text, sender }) => {
+        appendMessage(text, sender);
+      });
+    } catch (e) {
+      console.warn('Failed to restore chat history:', e);
+    }
+  }
+
+  function saveChatHistory() {
+    const messages = Array.from(chatBody.querySelectorAll('.saicf-widget-message')).map(el => ({
+      text: el.textContent,
+      sender: el.classList.contains('widget-user-message') ? 'user' : 'bot'
+    }));
+    sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }
+
+  restoreChatHistory();
 
   chatWidgetIcon.addEventListener('click', () => {
     ensureMarked().then(() => {
@@ -1877,6 +1905,7 @@ async function initializeChatWidget() {
 
       es.addEventListener('end', () => {
         updateBotMessage(currentBotMessage);
+        saveChatHistory();
         es.close();
         finish();
         resolve();
